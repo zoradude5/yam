@@ -3,16 +3,20 @@ package media.yam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.provider.MediaStore.Audio.Media;
+import android.widget.Toast;
 
 public class PlayerService extends Service {
 	private MultiPlayer mp;
-	private ArrayList<Long> playlist;
+	private List<Long> playlist;
 	private int position;
 	private boolean shuffle = false;
 	
@@ -25,6 +29,11 @@ public class PlayerService extends Service {
 	}
 	
 	void play() {
+		if(!mp.isInitialized()) {
+			mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
+					String.valueOf(playlist.get(position))).toString());
+			mp.prepare();
+		}
 		mp.play();
 	}
 	
@@ -46,7 +55,7 @@ public class PlayerService extends Service {
 	}
 	
 	void setPlaylist(Long[] playlist) {
-		this.playlist = (ArrayList<Long>) Arrays.asList(playlist);
+		this.playlist = Arrays.asList(playlist);
 	}
 	
 	void appendToPlaylist(long song) {
@@ -57,13 +66,6 @@ public class PlayerService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		mp.release();
-	}
-
-    private final IBinder mBinder = new LocalBinder();
-	
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return mBinder;
 	}
 	
 	private class MultiPlayer {
@@ -126,6 +128,13 @@ public class PlayerService extends Service {
 			mp.release();
 			initialized = playing = false;
 		}
+	}
+
+    private final IBinder mBinder = new LocalBinder();
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return mBinder;
 	}
 	
     public class LocalBinder extends Binder {

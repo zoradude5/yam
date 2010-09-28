@@ -13,10 +13,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.Toast;
 
 public class Player extends Activity {
 	private PlayerService player;
 	private boolean playerIsBound;
+	private Long[] playlist;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +26,7 @@ public class Player extends Activity {
 		setContentView(R.layout.player);
 		Intent i = getIntent();
 		Bundle extras = i.getExtras();
-		String path = extras.getString(SongList.KEY_PATH);
-
+		playlist = new Long[]{extras.getLong(SongList.KEY_PATH)};
 		doBindService();
 
 	    Button play = (Button) findViewById(R.id.playButton);
@@ -43,11 +44,12 @@ public class Player extends Activity {
 	}
 	
 	private ServiceConnection playerConnection = new ServiceConnection() {
-		public void onServiceDisconnected(ComponentName name) {
-			player = null;
-		}
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			player = ((PlayerService.LocalBinder)service).getService();
+			player.setPlaylist(playlist);
+		}
+		public void onServiceDisconnected(ComponentName name) {
+			player = null;
 		}
 	};
 	
