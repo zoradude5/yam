@@ -1,0 +1,22 @@
+play count db / increment on play
+goes to next song on playlist when playlist finishes
+next/prev button.
+repeat
+shuffle (selection without replacement?)
+play this song next / add to end of current playlist
+playlist view
+move items around in playlist view (like doubletwist)
+seek bar
+skip count increment
+record every play/time/duration instead of keeping count?
+add a like/dislike feature
+filtering based on counts/skips
+foreground process -- notification bar, so we don't get killed
+lifecycle stuff
+let go of resources during onpause/ondestroy!!!!
+
+analysis on plays/time/duration/skips
+web display of plays/time/durations/skips? seems unnecessary to display it all. how do you make info relevant?
+pretty ui for player
+lock screen
+widget
