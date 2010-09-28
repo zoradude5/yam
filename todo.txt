@@ -12,6 +12,7 @@ record every play/time/duration instead of keeping count?
 add a like/dislike feature
 filtering based on counts/skips
 foreground process -- notification bar, so we don't get killed ?? how do we do this ?? I'm simmingish it now
+start foreground issue -- is that because service is in the same process/thread? -- killing player kills service/playing
 lifecycle stuff
 let go of resources during onpause/ondestroy!!!!
 broadcast album/artist/song changes?

@@ -29,6 +29,7 @@ public class PlayerService extends Service {
 	public static String PLAYLIST_POSITION = "position";
 	private String playlistType;
 	private long playlistId;
+	private NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 	
 	@Override
 	public void onCreate() {
@@ -100,7 +101,6 @@ public class PlayerService extends Service {
 
 	void play() {//if paused, then increment -- remove the old increment from changesong
 		mp.play();
-		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		Notification n = new Notification(R.drawable.icon, "Song", System.currentTimeMillis());
 		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
 		n.flags |= Notification.FLAG_ONGOING_EVENT;
@@ -111,7 +111,6 @@ public class PlayerService extends Service {
 	
 	void pause() {
 		mp.pause();
-		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(0);
 		stopForeground(true);
 	}
@@ -173,6 +172,7 @@ public class PlayerService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		nm.cancel(0);
 		mp.release();
 		db.close();
 	}
