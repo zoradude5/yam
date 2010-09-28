@@ -7,18 +7,21 @@ import java.util.List;
 
 import android.app.Service;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Media;
-import android.widget.Toast;
 
 public class PlayerService extends Service {
 	private MultiPlayer mp;
 	private List<Long> playlist;
 	private int position;
 	private boolean shuffle = false;
+	public static String PLAYLIST_POSITION = "position";
 	
 	@Override
 	public void onCreate() {
@@ -28,6 +31,24 @@ public class PlayerService extends Service {
 		}
 	}
 	
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		Bundle extras = intent.getExtras();
+		if(extras.containsKey(PLAYLIST_POSITION)) {
+			position = extras.getInt(PLAYLIST_POSITION);
+		}
+		
+
+		if(extras.containsKey(Audio.Artists.ARTIST)) {
+			Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
+					new String[]{Media._ID}, Media.ARTIST_KEY + "=?", 
+					new String[]{extras.getString(Audio.Artists.ARTIST)}, null);
+			setPlaylist(results);
+			results.close();
+		}
+		return super.onStartCommand(intent, flags, startId);
+	}
+
 	void play() {
 		if(!mp.isInitialized()) {
 			mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
@@ -56,6 +77,14 @@ public class PlayerService extends Service {
 	
 	void setPlaylist(Long[] playlist) {
 		this.playlist = Arrays.asList(playlist);
+	}
+	
+	void setPlaylist(Cursor results) {
+		playlist = new ArrayList<Long>(results.getCount());
+		results.moveToFirst();
+		do {
+			playlist.add(results.getLong(results.getColumnIndexOrThrow(Media._ID)));
+		} while(results.moveToNext());
 	}
 	
 	void appendToPlaylist(long song) {

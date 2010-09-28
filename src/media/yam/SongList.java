@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Media;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +23,7 @@ public class SongList extends ListActivity {
 	private static final int PLAY_SONG = 1;
 	
 	public static final String KEY_PATH = "path";
+	private Bundle extras;
 
 
 
@@ -29,9 +31,18 @@ public class SongList extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        extras = getIntent().getExtras();
+        
+        String selection = null;
+        
+        if(extras.containsKey(Audio.Artists.ARTIST)) {
+        	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST);
+        }
+        
         
         Cursor c = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-        		new String[]{Media._ID, Media.TITLE}, null, null, null);
+        		new String[]{Media._ID, Media.TITLE}, selection, null, null);
+        
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
         		new String[]{Media.TITLE}, new int[]{R.id.song_title});
         setListAdapter(adapter);
@@ -51,7 +62,13 @@ public class SongList extends ListActivity {
 
 	private void launchPlayer(long id) {
 		Intent i = new Intent(this, Player.class);
-		i.putExtra(KEY_PATH, id);
+		if(extras.containsKey(Audio.Artists.ARTIST)) {
+			i.putExtra(Audio.Artists.ARTIST, extras.getLong(Media.ARTIST));
+			i.putExtra(PlayerService.PLAYLIST_POSITION, id);
+		}
+		else {
+			i.putExtra(KEY_PATH, id);
+		}
 		startActivityForResult(i, PLAY_SONG);
 	}
 }
