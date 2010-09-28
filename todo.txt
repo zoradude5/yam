@@ -1,5 +1,6 @@
 play time/ seek bar update
 move bar doesn't cause weird sound artifacts
+metadata for current song
 prev
 repeat
 shuffle (selection without replacement?)
