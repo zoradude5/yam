@@ -4,7 +4,8 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore.Audio.Artists;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -22,10 +23,10 @@ public class ArtistList extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.songs);
         
-        Cursor c = getContentResolver().query(Artists.EXTERNAL_CONTENT_URI, 
-        		new String[]{Artists._ID, Artists.ARTIST}, null, null, null);
+        Cursor c = getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, 
+        		new String[]{Media._ID, Media.ARTIST}, null, null, null);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
-        		new String[]{Artists.ARTIST}, new int[]{R.id.song_title});
+        		new String[]{Media.ARTIST}, new int[]{R.id.song_title});
         setListAdapter(adapter);
         
         ListView lv = getListView();
@@ -43,7 +44,7 @@ public class ArtistList extends ListActivity {
 
 	private void launchArtistsSongs(long id) {
 		Intent i = new Intent(this, AlbumList.class);
-		i.putExtra(Artists.ARTIST, id);
+		i.putExtra(Media.ARTIST_ID, id);
 		startActivityForResult(i, PLAY_SONG);
 	}
 }

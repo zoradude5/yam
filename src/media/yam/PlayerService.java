@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Media;
 import android.util.Log;
 
@@ -29,7 +28,12 @@ public class PlayerService extends Service {
 	public static String PLAYLIST_POSITION = "position";
 	private String playlistType;
 	private long playlistId;
-	private NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+	private NotificationManager nm;
+
+	private static final String ACTION_PAUSE = "media.yam.action.PAUSE";
+	private static final String ACTION_PLAY = "media.yam.action.PLAY";
+	private static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
+	
 	
 	@Override
 	public void onCreate() {
@@ -37,6 +41,7 @@ public class PlayerService extends Service {
 		if(mp == null) {
 			mp = new MultiPlayer();
 		}
+		nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		db = new MediaDB(this);
 		db.open();
 	}
@@ -45,26 +50,31 @@ public class PlayerService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
 		if(extras != null) {
+			if(ACTION_PLAY_NEXT.equals(intent.getAction())) {
+				if(extras.containsKey(Media._ID)) {
+					playNext(extras.getLong(Media._ID));
+				}
+			}
 			boolean changes = false;
-			if(extras.containsKey(Media.ARTIST)) {
-				if(playlistType != Media.ARTIST || playlistId != extras.getLong(Media.ARTIST)) {
-					playlistType = Media.ARTIST;
-					playlistId = extras.getLong(Media.ARTIST);
+			if(extras.containsKey(Media.ARTIST_ID)) {
+				if(playlistType != Media.ARTIST_ID || playlistId != extras.getLong(Media.ARTIST_ID)) {
+					playlistType = Media.ARTIST_ID;
+					playlistId = extras.getLong(Media.ARTIST_ID);
 					Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
 							new String[]{Media._ID}, Media.ARTIST_ID + "=?", 
-							new String[]{String.valueOf(extras.getLong(Media.ARTIST))}, null);
+							new String[]{String.valueOf(extras.getLong(Media.ARTIST_ID))}, null);
 					setPlaylist(results);
 					results.close();
 					changes = true;
 				}
 			}
-			else if(extras.containsKey(Media.ALBUM)) {
-				if(playlistType != Media.ALBUM || playlistId != extras.getLong(Media.ALBUM)) {
-					playlistType = Media.ALBUM;
-					playlistId = extras.getLong(Media.ALBUM);
+			else if(extras.containsKey(Media.ALBUM_ID)) {
+				if(playlistType != Media.ALBUM_ID || playlistId != extras.getLong(Media.ALBUM_ID)) {
+					playlistType = Media.ALBUM_ID;
+					playlistId = extras.getLong(Media.ALBUM_ID);
 					Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
 							new String[]{Media._ID}, Media.ALBUM_ID + "=?", 
-							new String[]{String.valueOf(extras.getLong(Media.ALBUM))}, null);
+							new String[]{String.valueOf(extras.getLong(Media.ALBUM_ID))}, null);
 					setPlaylist(results);
 					results.close();
 					changes = true;

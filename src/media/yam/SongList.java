@@ -4,7 +4,6 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Media;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,11 +28,11 @@ public class SongList extends ListActivity {
         
         String selection = null;
         
-        if(extras.containsKey(Media.ARTIST)) {
-        	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST);
+        if(extras.containsKey(Media.ARTIST_ID)) {
+        	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
         }
-        else if(extras.containsKey(Media.ALBUM)) {
-        	selection = Media.ALBUM_ID + "=" + extras.getLong(Media.ALBUM);
+        else if(extras.containsKey(Media.ALBUM_ID)) {
+        	selection = Media.ALBUM_ID + "=" + extras.getLong(Media.ALBUM_ID);
         }
         
         
@@ -59,12 +58,12 @@ public class SongList extends ListActivity {
 
 	private void launchPlayer(int position) {
 		Intent i = new Intent(this, Player.class);
-		if(extras.containsKey(Media.ARTIST)) {
-			i.putExtra(Media.ARTIST, extras.getLong(Media.ARTIST));
+		if(extras.containsKey(Media.ARTIST_ID)) {
+			i.putExtra(Media.ARTIST_ID, extras.getLong(Media.ARTIST_ID));
 			i.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		}
-		else if(extras.containsKey(Media.ALBUM)) {
-			i.putExtra(Media.ALBUM, extras.getLong(Media.ALBUM));
+		else if(extras.containsKey(Media.ALBUM_ID)) {
+			i.putExtra(Media.ALBUM_ID, extras.getLong(Media.ALBUM_ID));
 			i.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		}
 		else {
