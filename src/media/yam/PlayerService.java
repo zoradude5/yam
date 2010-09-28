@@ -86,9 +86,9 @@ public class PlayerService extends Service {
 		if(shuffle) {
 			
 		}
-		else {
+		else { // this should only happen in case of repeat!!!!! remove this soon TODO TODO
 			if(position == playlist.size() - 1) {
-				position = 0;
+				position = 0; 
 			}
 			else {
 				position++;
@@ -124,10 +124,21 @@ public class PlayerService extends Service {
 		mp.release();
 	}
 	
+	MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
+		@Override
+		public void onCompletion(MediaPlayer mediaPlayer) {
+			next();
+		}
+	};
+	
 	private class MultiPlayer {
 		private MediaPlayer mp = new MediaPlayer();
 		private boolean initialized = false;
 		private boolean playing = false;
+		
+		public MultiPlayer() {
+			mp.setOnCompletionListener(completionListener);
+		}
 		
 		void setDataSource(String path) {
 			if(this.isInitialized() || this.isPlaying()) {
