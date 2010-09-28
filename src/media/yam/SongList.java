@@ -53,7 +53,7 @@ public class SongList extends ListActivity {
         lv.setOnItemClickListener(new OnItemClickListener() {
           public void onItemClick(AdapterView<?> parent, View view,
               int position, long id) {
-        	  launchPlayer(id);
+        	  launchPlayer(position);
           }
         });
     }
@@ -64,7 +64,7 @@ public class SongList extends ListActivity {
 		Intent i = new Intent(this, Player.class);
 		if(extras.containsKey(Audio.Artists.ARTIST)) {
 			i.putExtra(Audio.Artists.ARTIST, extras.getLong(Media.ARTIST));
-			i.putExtra(PlayerService.PLAYLIST_POSITION, id);
+			i.putExtra(PlayerService.PLAYLIST_POSITION, (int) id);
 		}
 		else {
 			i.putExtra(KEY_PATH, id);

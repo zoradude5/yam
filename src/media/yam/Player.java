@@ -18,23 +18,22 @@ import android.widget.Toast;
 public class Player extends Activity {
 	private PlayerService player;
 	private boolean playerIsBound;
-	private Long[] playlist;
+	private Bundle extras;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.player);
-		Intent i = getIntent();
-		Bundle extras = i.getExtras();
-		playlist = new Long[]{extras.getLong(SongList.KEY_PATH)};
+		extras = getIntent().getExtras();
 		doBindService();
+		startService(new Intent(this, PlayerService.class).putExtras(extras));
 
 	    Button play = (Button) findViewById(R.id.playButton);
 	    play.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(player.isPlaying()) {
-					player.pause();
+					player.pause(); // add button changing code to the player. playlisteneer?
 				}
 				else {
 					player.play();
@@ -46,7 +45,6 @@ public class Player extends Activity {
 	private ServiceConnection playerConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			player = ((PlayerService.LocalBinder)service).getService();
-			player.setPlaylist(playlist);
 		}
 		public void onServiceDisconnected(ComponentName name) {
 			player = null;

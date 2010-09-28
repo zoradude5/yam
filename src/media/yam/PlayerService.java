@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Media;
+import android.util.Log;
 
 public class PlayerService extends Service {
 	private MultiPlayer mp;
@@ -34,26 +35,44 @@ public class PlayerService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
-		if(extras.containsKey(PLAYLIST_POSITION)) {
-			position = extras.getInt(PLAYLIST_POSITION);
-		}
-		
-
-		if(extras.containsKey(Audio.Artists.ARTIST)) {
-			Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-					new String[]{Media._ID}, Media.ARTIST_KEY + "=?", 
-					new String[]{extras.getString(Audio.Artists.ARTIST)}, null);
-			setPlaylist(results);
-			results.close();
+		if(extras != null) {
+			boolean changes = false;
+			if(extras.containsKey(PLAYLIST_POSITION)) {
+				position = extras.getInt(PLAYLIST_POSITION);
+				changes = true;
+			}
+			
+	
+			if(extras.containsKey(Audio.Artists.ARTIST)) {
+				Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
+						new String[]{Media._ID}, Media.ARTIST_ID + "=?", 
+						new String[]{String.valueOf(extras.getLong(Audio.Artists.ARTIST))}, null);
+				setPlaylist(results);
+				results.close();
+				changes = true;
+			}
+			else if(extras.containsKey(SongList.KEY_PATH)) {
+				setPlaylist(new Long[]{extras.getLong(SongList.KEY_PATH)});
+				changes = true;
+			}
+			
+			if(changes) {
+				changeSong();
+				play();
+			}
 		}
 		return super.onStartCommand(intent, flags, startId);
+	}
+	
+	void changeSong() {
+		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
+				String.valueOf(playlist.get(position))).toString());
+		mp.prepare();
 	}
 
 	void play() {
 		if(!mp.isInitialized()) {
-			mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
-					String.valueOf(playlist.get(position))).toString());
-			mp.prepare();
+			changeSong();
 		}
 		mp.play();
 	}
@@ -80,11 +99,16 @@ public class PlayerService extends Service {
 	}
 	
 	void setPlaylist(Cursor results) {
-		playlist = new ArrayList<Long>(results.getCount());
-		results.moveToFirst();
-		do {
-			playlist.add(results.getLong(results.getColumnIndexOrThrow(Media._ID)));
-		} while(results.moveToNext());
+		if(results.getCount() > 0) {
+			playlist = new ArrayList<Long>(results.getCount());
+			results.moveToFirst();
+			do {
+				playlist.add(results.getLong(results.getColumnIndexOrThrow(Media._ID)));
+			} while(results.moveToNext());
+		}
+		else {
+			Log.w(PlayerService.class.getSimpleName(), "Service was given a query that produced no results. ");
+		}
 	}
 	
 	void appendToPlaylist(long song) {
@@ -103,6 +127,11 @@ public class PlayerService extends Service {
 		private boolean playing = false;
 		
 		void setDataSource(String path) {
+			if(this.isInitialized() || this.isPlaying()) {
+				mp.reset();
+				initialized = false;
+				playing = false;
+			}
 			try {
 				mp.setDataSource(path);
 			} catch (IllegalArgumentException e) {
@@ -117,7 +146,7 @@ public class PlayerService extends Service {
 			}
 		}
 		
-		void prepare() {
+		void prepare() { // I'm only keeping this separate because I want to consider async prep
 			try {
 				mp.prepare();
 			} catch (IllegalStateException e) {
