@@ -29,8 +29,11 @@ public class SongList extends ListActivity {
         
         String selection = null;
         
-        if(extras.containsKey(Audio.Artists.ARTIST)) {
+        if(extras.containsKey(Media.ARTIST)) {
         	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST);
+        }
+        else if(extras.containsKey(Media.ALBUM)) {
+        	selection = Media.ALBUM_ID + "=" + extras.getLong(Media.ALBUM);
         }
         
         
@@ -54,14 +57,18 @@ public class SongList extends ListActivity {
     
 
 
-	private void launchPlayer(long id) {
+	private void launchPlayer(int position) {
 		Intent i = new Intent(this, Player.class);
-		if(extras.containsKey(Audio.Artists.ARTIST)) {
-			i.putExtra(Audio.Artists.ARTIST, extras.getLong(Media.ARTIST));
-			i.putExtra(PlayerService.PLAYLIST_POSITION, (int) id);
+		if(extras.containsKey(Media.ARTIST)) {
+			i.putExtra(Media.ARTIST, extras.getLong(Media.ARTIST));
+			i.putExtra(PlayerService.PLAYLIST_POSITION, position);
+		}
+		else if(extras.containsKey(Media.ALBUM)) {
+			i.putExtra(Media.ALBUM, extras.getLong(Media.ALBUM));
+			i.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		}
 		else {
-			i.putExtra(KEY_PATH, id);
+			i.putExtra(KEY_PATH, position);
 		}
 		startActivityForResult(i, PLAY_SONG);
 	}

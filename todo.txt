@@ -4,7 +4,7 @@ prev
 repeat
 shuffle (selection without replacement?)
 play this song next / add to end of current playlist
-view for currently playing songs
+view for currently playing songs -- fix -- make less ugly
 playlist support
 move items around in playlist view (like doubletwist)
 skip count increment

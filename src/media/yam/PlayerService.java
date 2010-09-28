@@ -27,6 +27,8 @@ public class PlayerService extends Service {
 	private int position;
 	private boolean shuffle = false;
 	public static String PLAYLIST_POSITION = "position";
+	private String playlistType;
+	private long playlistId;
 	
 	@Override
 	public void onCreate() {
@@ -42,14 +44,30 @@ public class PlayerService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
 		if(extras != null) {
-			boolean changes = false;	
-			if(extras.containsKey(Audio.Artists.ARTIST)) {
-				Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-						new String[]{Media._ID}, Media.ARTIST_ID + "=?", 
-						new String[]{String.valueOf(extras.getLong(Audio.Artists.ARTIST))}, null);
-				setPlaylist(results);
-				results.close();
-				changes = true;
+			boolean changes = false;
+			if(extras.containsKey(Media.ARTIST)) {
+				if(playlistType != Media.ARTIST || playlistId != extras.getLong(Media.ARTIST)) {
+					playlistType = Media.ARTIST;
+					playlistId = extras.getLong(Media.ARTIST);
+					Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
+							new String[]{Media._ID}, Media.ARTIST_ID + "=?", 
+							new String[]{String.valueOf(extras.getLong(Media.ARTIST))}, null);
+					setPlaylist(results);
+					results.close();
+					changes = true;
+				}
+			}
+			else if(extras.containsKey(Media.ALBUM)) {
+				if(playlistType != Media.ALBUM || playlistId != extras.getLong(Media.ALBUM)) {
+					playlistType = Media.ALBUM;
+					playlistId = extras.getLong(Media.ALBUM);
+					Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
+							new String[]{Media._ID}, Media.ALBUM_ID + "=?", 
+							new String[]{String.valueOf(extras.getLong(Media.ALBUM))}, null);
+					setPlaylist(results);
+					results.close();
+					changes = true;
+				}
 			}
 			else if(extras.containsKey(SongList.KEY_PATH)) {
 				setPlaylist(new Long[]{extras.getLong(SongList.KEY_PATH)});
@@ -57,9 +75,11 @@ public class PlayerService extends Service {
 			}
 			
 			if(extras.containsKey(PLAYLIST_POSITION)) {
-				position = extras.getInt(PLAYLIST_POSITION);
-				changes = true;
-				db.increment(playlist.get(position), MediaDB.ACTION_CHOOSE);
+				if(position != extras.getInt(PLAYLIST_POSITION)) {
+					position = extras.getInt(PLAYLIST_POSITION);
+					changes = true;
+					db.increment(playlist.get(position), MediaDB.ACTION_CHOOSE);
+				}
 			}
 			
 			if(changes) {

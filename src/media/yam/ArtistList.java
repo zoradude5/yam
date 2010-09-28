@@ -1,23 +1,15 @@
 package media.yam;
 
-import java.io.File;
-import java.util.Arrays;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Artists;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 public class ArtistList extends ListActivity {
 	private static final int PLAY_SONG = 1;
@@ -50,7 +42,7 @@ public class ArtistList extends ListActivity {
 
 
 	private void launchArtistsSongs(long id) {
-		Intent i = new Intent(this, SongList.class);
+		Intent i = new Intent(this, AlbumList.class);
 		i.putExtra(Artists.ARTIST, id);
 		startActivityForResult(i, PLAY_SONG);
 	}
