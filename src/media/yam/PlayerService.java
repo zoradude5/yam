@@ -78,6 +78,11 @@ public class PlayerService extends Service {
 		mp.pause();
 	}
 	
+	void seekPercent(int percent) {
+		int newTime = (int) (percent * mp.duration() / 100); 
+		mp.seek(newTime);
+	}
+	
 	boolean isPlaying() {
 		return mp.isPlaying();
 	}
@@ -185,6 +190,14 @@ public class PlayerService extends Service {
 				mp.pause();
 				playing = false;
 			}
+		}
+		
+		void seek(int msec) {
+			mp.seekTo(msec);
+		}
+		
+		long duration() {
+			return mp.getDuration();
 		}
 		
 		boolean isInitialized() {

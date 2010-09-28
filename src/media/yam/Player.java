@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 public class Player extends Activity {
@@ -45,6 +46,21 @@ public class Player extends Activity {
 			@Override
 			public void onClick(View v) {
 				player.next();
+			}
+		});
+	    SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
+	    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				player.seekPercent(progress);
 			}
 		});
 	}
