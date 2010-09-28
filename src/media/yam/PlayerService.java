@@ -146,6 +146,10 @@ public class PlayerService extends Service {
 		playlist.add(song);
 	}
 
+	public Long[] getPlaylist() {
+		return playlist.toArray(new Long[]{});
+	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();

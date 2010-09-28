@@ -15,6 +15,7 @@
             </intent-filter>
         </activity>
 		<activity android:name=".Player" />
+		<activity android:name=".CurrentlyPlaying" />
 		<service android:name=".PlayerService" />
     </application>
 

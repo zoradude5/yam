@@ -27,4 +27,10 @@
     android:layout_height="wrap_content" 
     android:text="library"
     />
+<Button
+	android:id="@+id/currentButton"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="current"
+    />
 </LinearLayout>

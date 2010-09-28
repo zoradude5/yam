@@ -17,6 +17,8 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 public class Player extends Activity {
+	public static final String PLAYLIST = "playlist";
+	
 	private PlayerService player;
 	private boolean playerIsBound;
 	private Bundle extras;
@@ -57,6 +59,19 @@ public class Player extends Activity {
 			@Override
 			public void onClick(View v) {
 				startActivityForResult(new Intent(Player.this, ArtistList.class), 0);
+			}
+		});
+	    Button current = (Button) findViewById(R.id.currentButton);
+	    current.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Long[] pl = player.getPlaylist();
+				long[] playlist = new long[pl.length];
+				for(int i = 0; i < pl.length; i++) {
+					playlist[i] = pl[i];
+				}
+				startActivityForResult(new Intent(Player.this, CurrentlyPlaying.class)
+					.putExtra(PLAYLIST, playlist), 0);
 			}
 		});
 	    SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
