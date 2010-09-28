@@ -58,7 +58,6 @@ public class PlayerService extends Service {
 			
 			if(changes) {
 				changeSong();
-				play();
 			}
 		}
 		return super.onStartCommand(intent, flags, startId);
@@ -68,12 +67,10 @@ public class PlayerService extends Service {
 		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
 				String.valueOf(playlist.get(position))).toString());
 		mp.prepare();
+		play();
 	}
 
 	void play() {
-		if(!mp.isInitialized()) {
-			changeSong();
-		}
 		mp.play();
 	}
 	
@@ -90,7 +87,13 @@ public class PlayerService extends Service {
 			
 		}
 		else {
-			position++;//TODO NOT WORKING
+			if(position == playlist.size() - 1) {
+				position = 0;
+			}
+			else {
+				position++;
+			}
+			changeSong();
 		}
 	}
 	

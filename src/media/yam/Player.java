@@ -40,6 +40,13 @@ public class Player extends Activity {
 				}
 			}
 		});
+	    Button next = (Button) findViewById(R.id.nextButton);
+	    next.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				player.next();
+			}
+		});
 	}
 	
 	private ServiceConnection playerConnection = new ServiceConnection() {
