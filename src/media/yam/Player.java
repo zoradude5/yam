@@ -27,7 +27,11 @@ public class Player extends Activity {
 		setContentView(R.layout.player);
 		extras = getIntent().getExtras();
 		doBindService();
-		startService(new Intent(this, PlayerService.class).putExtras(extras));
+		Intent i = new Intent(this, PlayerService.class);
+		if(extras != null) {
+			i.putExtras(extras);
+		}
+		startService(i);
 
 	    Button play = (Button) findViewById(R.id.playButton);
 	    play.setOnClickListener(new View.OnClickListener() {
@@ -37,7 +41,7 @@ public class Player extends Activity {
 					player.pause(); // add button changing code to the player. playlisteneer?
 				}
 				else {
-					player.play();
+					player.play();// change this to a message passing thing!!!
 				}
 			}
 		});
@@ -46,6 +50,13 @@ public class Player extends Activity {
 			@Override
 			public void onClick(View v) {
 				player.next();
+			}
+		});
+	    Button library = (Button) findViewById(R.id.libraryButton);
+	    library.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivityForResult(new Intent(Player.this, ArtistList.class), 0);
 			}
 		});
 	    SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);

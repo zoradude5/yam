@@ -1,23 +1,16 @@
 package media.yam;
 
-import java.io.File;
-import java.util.Arrays;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Audio;
 import android.provider.MediaStore.Audio.Media;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 public class SongList extends ListActivity {
 	private static final int PLAY_SONG = 1;
@@ -31,6 +24,7 @@ public class SongList extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.songs);
         extras = getIntent().getExtras();
         
         String selection = null;

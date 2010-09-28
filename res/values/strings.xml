@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World, SongList!</string>
     <string name="app_name">yam</string>
+<string name="list_empty">&quot;The list is empty!&quot;</string>
 </resources>

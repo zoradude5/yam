@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +22,7 @@ import android.util.Log;
 
 public class PlayerService extends Service {
 	private MultiPlayer mp;
+	private MediaDB db;
 	private List<Long> playlist;
 	private int position;
 	private boolean shuffle = false;
@@ -30,19 +34,15 @@ public class PlayerService extends Service {
 		if(mp == null) {
 			mp = new MultiPlayer();
 		}
+		db = new MediaDB(this);
+		db.open();
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
 		if(extras != null) {
-			boolean changes = false;
-			if(extras.containsKey(PLAYLIST_POSITION)) {
-				position = extras.getInt(PLAYLIST_POSITION);
-				changes = true;
-			}
-			
-	
+			boolean changes = false;	
 			if(extras.containsKey(Audio.Artists.ARTIST)) {
 				Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
 						new String[]{Media._ID}, Media.ARTIST_ID + "=?", 
@@ -56,6 +56,12 @@ public class PlayerService extends Service {
 				changes = true;
 			}
 			
+			if(extras.containsKey(PLAYLIST_POSITION)) {
+				position = extras.getInt(PLAYLIST_POSITION);
+				changes = true;
+				db.increment(playlist.get(position), MediaDB.ACTION_CHOOSE);
+			}
+			
 			if(changes) {
 				changeSong();
 			}
@@ -67,15 +73,27 @@ public class PlayerService extends Service {
 		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
 				String.valueOf(playlist.get(position))).toString());
 		mp.prepare();
+		db.increment(playlist.get(position), MediaDB.ACTION_PLAY);
+		//this should move to play, but the issue is play after a pause
 		play();
 	}
 
-	void play() {
+	void play() {//if paused, then increment -- remove the old increment from changesong
 		mp.play();
+		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		Notification n = new Notification(R.drawable.icon, "Song", System.currentTimeMillis());
+		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
+		n.flags |= Notification.FLAG_ONGOING_EVENT;
+		n.setLatestEventInfo(this, "Current song", "more info", pi);
+		startForeground(0, n);
+		nm.notify(0, n);
 	}
 	
 	void pause() {
 		mp.pause();
+		NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		nm.cancel(0);
+		stopForeground(true);
 	}
 	
 	void seekPercent(int percent) {
@@ -88,6 +106,7 @@ public class PlayerService extends Service {
 	}
 	
 	void next() {
+		db.increment(playlist.get(position), MediaDB.ACTION_SKIP);
 		if(shuffle) {
 			
 		}
@@ -119,6 +138,10 @@ public class PlayerService extends Service {
 		}
 	}
 	
+	void playNext(long song) {//untested TODO
+		playlist.add(position + 1, song);
+	}
+	
 	void appendToPlaylist(long song) {
 		playlist.add(song);
 	}
@@ -127,6 +150,7 @@ public class PlayerService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		mp.release();
+		db.close();
 	}
 	
 	MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
