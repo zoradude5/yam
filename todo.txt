@@ -6,11 +6,10 @@ repeat
 shuffle (selection without replacement?)
 play this song next / add to end of current playlist
 view for currently playing songs -- fix -- make less ugly
-playlist support
-move items around in playlist view (like doubletwist)
-skip count increment
+support for playlists on device
+move items around in current playlist view (like doubletwist)
+skip count increment -- do it in the right places
 record every play/time/duration instead of keeping count?
-add a like/dislike feature
 filtering based on counts/skips
 foreground process -- notification bar, so we don't get killed ?? how do we do this ?? I'm simmingish it now
 start foreground issue -- is that because service is in the same process/thread? -- killing player kills service/playing
