@@ -2,6 +2,8 @@ play time/ seek bar update
 move bar doesn't cause weird sound artifacts
 metadata for current song
 prev
+for scroller thing with letter
+player UI for buttons that are images
 repeat
 shuffle (selection without replacement?)
 play this song next / add to end of current playlist

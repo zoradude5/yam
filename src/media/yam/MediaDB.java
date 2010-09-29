@@ -1,10 +1,14 @@
 package media.yam;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.provider.MediaStore.Audio.Media;
 import android.util.Log;
 
 public class MediaDB {
@@ -76,6 +80,29 @@ public class MediaDB {
     
     public long increment(long id, int type) {
     	return add(id, type, System.currentTimeMillis());
+    }
+    
+    public static class SongInfo {
+    	long id;
+    	String title, album, artist;
+    	SongInfo(String artist, String album, String title) {
+    		this.artist = artist;
+    		this.album = album;
+    		this.title = title;
+    	}
+    	public String toString() {
+    		return title;
+    	}
+    }
+    
+    public static SongInfo getSong(ContentResolver cr, long id) {
+    	Cursor c = cr.query(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, String.valueOf(id)), 
+			new String[]{Media.ARTIST, Media.ALBUM, Media.TITLE}, 
+			null, null, null);
+    	c.moveToFirst();
+    	SongInfo si = new SongInfo(c.getString(0), c.getString(1), c.getString(2));
+    	c.close();
+    	return si;
     }
 
 }
