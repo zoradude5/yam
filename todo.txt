@@ -25,3 +25,27 @@ web display of plays/time/durations/skips? seems unnecessary to display it all. 
 pretty ui for player
 lock screen
 widget
+
+
+Move screen sideways after skipping song. It restarts the song from the first one.
+
+alphabet thing
+
+I need titles on artist/album/song pages. I need pretty buttons!
+
+Unplug headphones
+
+Phone calls
+
+Pause during notifications? 
+Make the scroll box bounce
+Artist info
+Remove bad buttons
+Shuffle, repeat
+Currently playing
+
+Custom playlists
+
+Keep track of play time of track in media player. (like total time. So skipping  to end would be really short compared to song length, and going back tio beginning when almost done is longer than  song length
+
+key for counts in DB shouldn't be DB ID -- look for something that's unique to the song!!!!
