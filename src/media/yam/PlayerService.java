@@ -22,7 +22,7 @@ import android.util.Log;
 public class PlayerService extends Service {
 	private MultiPlayer mp;
 	private MediaDB db;
-	private List<Long> playlist;
+	private List<Long> playlist = new ArrayList<Long>();
 	private int position;
 	private boolean shuffle = false;
 	private String playlistType;
