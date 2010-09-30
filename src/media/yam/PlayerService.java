@@ -25,14 +25,14 @@ public class PlayerService extends Service {
 	private List<Long> playlist;
 	private int position;
 	private boolean shuffle = false;
-	public static String PLAYLIST_POSITION = "position";
 	private String playlistType;
 	private long playlistId;
 	private NotificationManager nm;
 
-	private static final String ACTION_PAUSE = "media.yam.action.PAUSE";
-	private static final String ACTION_PLAY = "media.yam.action.PLAY";
-	private static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
+	public static String PLAYLIST_POSITION = "position";
+	public static final String ACTION_PAUSE = "media.yam.action.PAUSE";
+	public static final String ACTION_PLAY = "media.yam.action.PLAY";
+	public static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
 	
 	
 	@Override
