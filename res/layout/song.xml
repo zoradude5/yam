@@ -2,9 +2,10 @@
 <TextView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/song_title"
+	android:lines="1"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content"
-    android:paddingBottom="5dp"
+    android:paddingBottom="7dp"
     android:paddingTop="5dp"
-    android:textSize="22sp" 
+    android:textSize="24sp" 
     />

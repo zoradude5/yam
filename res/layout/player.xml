@@ -1,36 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
 <Button
-	android:id="@+id/playButton"
+	android:id="@+id/playButton2"
     android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+    android:layout_height="wrap_content"
     android:text="play/pause"
     />
 <Button
-	android:id="@+id/nextButton"
+	android:id="@+id/nextButton2"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:layout_below="@id/playButton2" 
     android:text="next"
     />
 <SeekBar
 	android:id="@+id/seekBar"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:layout_below="@id/nextButton2" 
     />
 <Button
-	android:id="@+id/libraryButton"
+	android:id="@+id/libraryButton2"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:layout_below="@id/seekBar" 
     android:text="library"
     />
 <Button
 	android:id="@+id/currentButton"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:layout_below="@id/libraryButton2" 
     android:text="current"
-    />
-</LinearLayout>
+    /><!-- 
+<ImageView
+	android:id="@+id/prevButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+	android:layout_alignParentBottom="true"
+   	android:src="@drawable/prev" />-->
+<ImageView
+	android:id="@+id/libraryButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+	android:layout_alignParentBottom="true"
+   	android:src="@drawable/library" />
+<ImageView
+	android:id="@+id/playButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:layout_alignParentBottom="true"
+	android:layout_centerHorizontal="true"
+   	android:src="@drawable/pause" />
+<ImageView
+	android:id="@+id/nextButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:layout_alignParentRight="true"
+	android:layout_alignParentBottom="true"
+   	android:src="@drawable/next" />
+</RelativeLayout>

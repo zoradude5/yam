@@ -111,7 +111,8 @@ public class PlayerService extends Service {
 
 	void play() {//if paused, then increment -- remove the old increment from changesong
 		mp.play();
-		Notification n = new Notification(R.drawable.icon, "Song", System.currentTimeMillis());
+		Notification n = new Notification();
+		n.icon = R.drawable.icon;
 		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
 		n.flags |= Notification.FLAG_ONGOING_EVENT;
 		n.setLatestEventInfo(this, "Current song", "more info", pi);

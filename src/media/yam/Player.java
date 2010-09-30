@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 
 public class Player extends Activity {
@@ -29,12 +32,58 @@ public class Player extends Activity {
 		}
 		startService(i);
 
-	    Button play = (Button) findViewById(R.id.playButton);
+		ImageView play = (ImageView) findViewById(R.id.playButton);
 	    play.setOnClickListener(playOnClickListener);
-	    Button next = (Button) findViewById(R.id.nextButton);
+	    play.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+					if(player.isPlaying()) {
+						((ImageView) v).setImageResource(R.drawable.pause_depressed);
+					}
+					else {
+						((ImageView) v).setImageResource(R.drawable.play_depressed);
+					}
+				}
+				else {
+					if(player.isPlaying()) {//change this to rely on a message or something sent by service
+						((ImageView) v).setImageResource(R.drawable.play);
+					}
+					else {
+						((ImageView) v).setImageResource(R.drawable.pause);
+					}
+				}
+				return false;
+			}
+		});
+	    ImageView next = (ImageView) findViewById(R.id.nextButton);
 	    next.setOnClickListener(nextOnClickListener);
-	    Button library = (Button) findViewById(R.id.libraryButton);
+	    next.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+					((ImageView) v).setImageResource(R.drawable.next_depressed);
+				}
+				else {
+					((ImageView) v).setImageResource(R.drawable.next);
+				}
+				return false;
+			}
+		});
+	    ImageView library = (ImageView) findViewById(R.id.libraryButton);
 	    library.setOnClickListener(libraryOnClickListener);
+	    library.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+					((ImageView) v).setImageResource(R.drawable.library_depressed);
+				}
+				else {
+					((ImageView) v).setImageResource(R.drawable.library);
+				}
+				return false;
+			}
+		});
 	    Button current = (Button) findViewById(R.id.currentButton);
 	    current.setOnClickListener(currentOnClickListener);
 	    SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
