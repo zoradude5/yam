@@ -3,11 +3,9 @@ move bar doesn't cause weird sound artifacts
 metadata for current song
 prev
 for scroller thing with letter
-player UI for buttons that are images
 repeat
 shuffle (selection without replacement?)
 play this song next / add to end of current playlist
-view for currently playing songs -- fix -- make less ugly
 support for playlists on device
 move items around in current playlist view (like doubletwist)
 skip count increment -- do it in the right places
@@ -19,6 +17,8 @@ lifecycle stuff
 let go of resources during onpause/ondestroy!!!!
 broadcast album/artist/song changes?
 
+
+I would prefer sectioning to make position on scroll thing be equal for every section... so m is halfway down.g is a quarter down. right now, "section" from toolbar is based on where that section starts ont he list
 merging artists? -- recommendations, multiple merges (eminem, jayz feat eminem) and (jayz, jayz feat eminem)
 analysis on plays/time/duration/skips
 web display of plays/time/durations/skips? seems unnecessary to display it all. how do you make info relevant?

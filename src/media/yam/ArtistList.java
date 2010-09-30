@@ -25,8 +25,9 @@ public class ArtistList extends ListActivity {
         
         Cursor c = getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, 
         		new String[]{Media._ID, Media.ARTIST}, null, null, null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
-        		new String[]{Media.ARTIST}, new int[]{R.id.song_title});
+        SimpleCursorAdapter adapter = new SimpleAlphabetCursorAdapter(this, R.layout.song, c, 
+        		new String[]{Media.ARTIST}, new int[]{R.id.song_title}, 
+        		c.getColumnIndexOrThrow(Media.ARTIST));
         setListAdapter(adapter);
         
         ListView lv = getListView();
