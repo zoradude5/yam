@@ -92,17 +92,19 @@ public class SongList extends ListActivity {
 
 	private void launchPlayer(int position) {
 		Intent i = new Intent(this, Player.class);
+		Intent service = new Intent(this, PlayerService.class);
 		if(extras.containsKey(Media.ARTIST_ID)) {
-			i.putExtra(Media.ARTIST_ID, extras.getLong(Media.ARTIST_ID));
-			i.putExtra(PlayerService.PLAYLIST_POSITION, position);
+			service.putExtra(Media.ARTIST_ID, extras.getLong(Media.ARTIST_ID));
+			service.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		}
 		else if(extras.containsKey(Media.ALBUM_ID)) {
-			i.putExtra(Media.ALBUM_ID, extras.getLong(Media.ALBUM_ID));
-			i.putExtra(PlayerService.PLAYLIST_POSITION, position);
+			service.putExtra(Media.ALBUM_ID, extras.getLong(Media.ALBUM_ID));
+			service.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		}
 		else {
-			i.putExtra(KEY_PATH, position);
+			service.putExtra(KEY_PATH, position);
 		}
+		startService(service);
 		startActivityForResult(i, PLAY_SONG);
 	}
 }

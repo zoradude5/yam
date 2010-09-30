@@ -5,7 +5,7 @@ prev
 for scroller thing with letter
 repeat
 shuffle (selection without replacement?)
-play this song next / add to end of current playlist
+ add to end of current playlist
 support for playlists on device
 move items around in current playlist view (like doubletwist)
 skip count increment -- do it in the right places
@@ -42,10 +42,15 @@ Make the scroll box bounce
 Artist info
 Remove bad buttons
 Shuffle, repeat
-Currently playing
+Currently playing should be on player, in notification, and currently playing song should have an icon
 
 Custom playlists
 
 Keep track of play time of track in media player. (like total time. So skipping  to end would be really short compared to song length, and going back tio beginning when almost done is longer than  song length
 
 key for counts in DB shouldn't be DB ID -- look for something that's unique to the song!!!!
+
+should everybody talk to the player service for metadata?
+"current list"is calling the service/player with song/playlist args, so the orientation switch bug hapens there
+should current list talk directly to service to get current playlist?
+option to save current playlist, if it's been modified? option to move/remove from current playlist -- s/playlist/currently playing/g
