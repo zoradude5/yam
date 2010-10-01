@@ -18,7 +18,6 @@ import android.widget.TextView;
 public class AlbumList extends ListActivity {
 	private static final int PLAY_SONG = 1;
 	
-	public static final String KEY_PATH = "path";
 	private Bundle extras;
 
 	/** Called when the activity is first created. */

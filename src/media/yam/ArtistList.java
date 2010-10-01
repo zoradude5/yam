@@ -14,8 +14,6 @@ import android.widget.SimpleCursorAdapter;
 
 public class ArtistList extends ListActivity {
 	private static final int PLAY_SONG = 1;
-	
-	public static final String KEY_PATH = "path";
 
 	/** Called when the activity is first created. */
     @Override
