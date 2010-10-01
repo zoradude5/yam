@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import media.yam.MediaDB.SongInfo;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,11 +30,14 @@ public class PlayerService extends Service {
 	private String playlistType;
 	private long playlistId;
 	private NotificationManager nm;
+	private SongInfo currentSong;
 
 	public static String PLAYLIST_POSITION = "position";
 	public static final String ACTION_PAUSE = "media.yam.action.PAUSE";
 	public static final String ACTION_PLAY = "media.yam.action.PLAY";
 	public static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
+	
+	public static final String METADATA_CHANGED = "media.yam.broadcast.METADATA_CHANGED";
 	
 	
 	@Override
@@ -89,7 +94,6 @@ public class PlayerService extends Service {
 				if(position != extras.getInt(PLAYLIST_POSITION)) {
 					position = extras.getInt(PLAYLIST_POSITION);
 					changes = true;
-					db.increment(playlist.get(position), MediaDB.ACTION_CHOOSE);
 				}
 			}
 			
@@ -104,18 +108,25 @@ public class PlayerService extends Service {
 		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
 				String.valueOf(playlist.get(position))).toString());
 		mp.prepare();
-		db.increment(playlist.get(position), MediaDB.ACTION_PLAY);
-		//this should move to play, but the issue is play after a pause
+		currentSong = MediaDB.getSong(getContentResolver(), playlist.get(position));
+
+		Intent i = new Intent(METADATA_CHANGED);
+		i.putExtra("id", Long.valueOf(currentSong.id));
+		i.putExtra("artist", currentSong.artist);
+		i.putExtra("album",currentSong.album);
+		i.putExtra("title",currentSong.title);
+		sendBroadcast(i);
+		//this should move to play, but the issue is play after a pause -- we don't wnat to start form the beginning after a pause
 		play();
 	}
 
-	void play() {//if paused, then increment -- remove the old increment from changesong
+	void play() {
 		mp.play();
-		Notification n = new Notification();
+		Notification n = new Notification(); // make notification a static variable thing? a TODO
 		n.icon = R.drawable.icon;
 		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
 		n.flags |= Notification.FLAG_ONGOING_EVENT;
-		n.setLatestEventInfo(this, "Current song", "more info", pi);
+		n.setLatestEventInfo(this, currentSong.title, currentSong.artist, pi);
 		startForeground(0, n);
 		nm.notify(0, n);
 	}
@@ -135,8 +146,11 @@ public class PlayerService extends Service {
 		return mp.isPlaying();
 	}
 	
+	public int getPosition() {
+		return this.position;
+	}
+	
 	void next() {
-		db.increment(playlist.get(position), MediaDB.ACTION_SKIP);
 		if(shuffle) {
 			
 		}
@@ -191,6 +205,7 @@ public class PlayerService extends Service {
 	MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
 		@Override
 		public void onCompletion(MediaPlayer mediaPlayer) {
+			db.increment(playlist.get(position), MediaDB.ACTION_PLAY);
 			next();
 		}
 	};

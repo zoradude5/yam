@@ -58,7 +58,7 @@ public class SongList extends ListActivity {
         lv.setOnItemClickListener(new OnItemClickListener() {
           public void onItemClick(AdapterView<?> parent, View view,
               int position, long id) {
-        	  launchPlayer(position);
+        	  launchPlayer(position, id);
           }
         });
     }
@@ -76,7 +76,7 @@ public class SongList extends ListActivity {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         switch(item.getItemId()) {
         case MENU_PLAY_NOW:
-        	launchPlayer(info.position);
+        	launchPlayer(info.position, info.id);
         	break;
         case MENU_PLAY_NEXT:
         	Intent i = new Intent(this, PlayerService.class);
@@ -90,8 +90,7 @@ public class SongList extends ListActivity {
     
 
 
-	private void launchPlayer(int position) {
-		Intent i = new Intent(this, Player.class);
+	private void launchPlayer(int position, long id) {
 		Intent service = new Intent(this, PlayerService.class);
 		if(extras.containsKey(Media.ARTIST_ID)) {
 			service.putExtra(Media.ARTIST_ID, extras.getLong(Media.ARTIST_ID));
@@ -105,6 +104,8 @@ public class SongList extends ListActivity {
 			service.putExtra(KEY_PATH, position);
 		}
 		startService(service);
+		Intent i = new Intent(this, Player.class);
+		i.putExtra(Media._ID, id);
 		startActivityForResult(i, PLAY_SONG);
 	}
 }

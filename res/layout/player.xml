@@ -3,39 +3,43 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<Button
-	android:id="@+id/playButton2"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content"
-    android:text="play/pause"
-    />
-<Button
-	android:id="@+id/nextButton2"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/playButton2" 
-    android:text="next"
-    />
 <SeekBar
 	android:id="@+id/seekBar"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:layout_below="@id/nextButton2" 
-    />
-<Button
-	android:id="@+id/libraryButton2"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/seekBar" 
-    android:text="library"
     />
 <Button
 	android:id="@+id/currentButton"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:layout_below="@id/libraryButton2" 
+    android:layout_below="@id/seekBar" 
     android:text="current"
-    /><!-- 
+    />
+<TextView
+	android:id="@+id/songTitle"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:layout_below="@id/currentButton" 
+	/>
+<TextView
+	android:id="@+id/songAlbum"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:layout_below="@id/songTitle" 
+	/>
+<TextView
+	android:id="@+id/songArtist"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:layout_below="@id/songAlbum" 
+	/>
+<ImageView
+	android:id="@+id/albumArt"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/currentButton" 
+    />
+    <!-- 
 <ImageView
 	android:id="@+id/prevButton"
     android:layout_width="wrap_content"

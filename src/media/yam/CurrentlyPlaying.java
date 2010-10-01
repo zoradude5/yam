@@ -16,6 +16,7 @@ public class CurrentlyPlaying extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		long[] playlist1 = getIntent().getExtras().getLongArray(Player.PLAYLIST);
+		int position = getIntent().getExtras().getInt(PlayerService.PLAYLIST_POSITION);
 		final SongInfo[] playlist = new SongInfo[playlist1.length];
 		for(int i = 0; i < playlist1.length; i++) {
 			playlist[i] = MediaDB.getSong(getContentResolver(), playlist1[i]);
@@ -39,5 +40,6 @@ public class CurrentlyPlaying extends ListActivity {
 					.putExtra(PlayerService.PLAYLIST_POSITION, position), 0);
 			}
 		});
+		setSelection(position);
 	}
 }

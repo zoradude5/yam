@@ -101,6 +101,7 @@ public class MediaDB {
 			null, null, null);
     	c.moveToFirst();
     	SongInfo si = new SongInfo(c.getString(0), c.getString(1), c.getString(2));
+    	si.id = id;
     	c.close();
     	return si;
     }

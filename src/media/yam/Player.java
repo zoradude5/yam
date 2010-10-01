@@ -1,17 +1,33 @@
 package media.yam;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URI;
+
+import media.yam.MediaDB.SongInfo;
+
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore.Audio.Media;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class Player extends Activity {
 	public static final String PLAYLIST = "playlist";
@@ -20,18 +36,20 @@ public class Player extends Activity {
 	private boolean playerIsBound;
 	private Bundle extras;
 
+	private TextView songTitle;
+	private TextView songAlbum;
+	private TextView songArtist;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.player);
-		extras = getIntent().getExtras();
 		doBindService();
-		Intent i = new Intent(this, PlayerService.class);
-		if(extras != null) {
-			i.putExtras(extras);
-		}
-		startService(i);
-
+		
+		IntentFilter f = new IntentFilter();
+		f.addAction(PlayerService.METADATA_CHANGED);
+		registerReceiver(broadcastReceiver, new IntentFilter(f));
+		
 		ImageView play = (ImageView) findViewById(R.id.playButton);
 	    play.setOnClickListener(playOnClickListener);
 	    play.setOnTouchListener(new View.OnTouchListener() {
@@ -88,6 +106,17 @@ public class Player extends Activity {
 	    current.setOnClickListener(currentOnClickListener);
 	    SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
 	    seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+
+	    songTitle = (TextView) Player.this.findViewById(R.id.songTitle);
+	    songAlbum = (TextView) Player.this.findViewById(R.id.songAlbum);
+	    songArtist = (TextView) Player.this.findViewById(R.id.songArtist);
+	    
+	    
+		extras = getIntent().getExtras();
+		if(extras != null) {
+			SongInfo song = MediaDB.getSong(getContentResolver(), extras.getLong(Media._ID));
+			setMeta(song);
+		}
 	}
 
 	@Override
@@ -95,6 +124,28 @@ public class Player extends Activity {
 		super.onDestroy();
 	    doUnbindService();
 	}
+	
+	void setMeta(Bundle extras) {
+		setMeta(extras.getString("title"), extras.getString("album"), extras.getString("artist"));
+	}
+	
+	void setMeta(SongInfo si) {
+		setMeta(si.title, si.album, si.artist);
+	}
+	
+	void setMeta(String title, String album, String artist) {
+		songTitle.setText(title);
+		songAlbum.setText(album);
+		songArtist.setText(artist);
+	}
+	
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		public void onReceive(Context context, Intent intent) {
+			if(intent.getAction().equals(PlayerService.METADATA_CHANGED)) {
+				setMeta(intent.getExtras());
+			}
+		}
+	};
 	
 	private ServiceConnection playerConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder service) {
@@ -152,7 +203,7 @@ public class Player extends Activity {
 				playlist[i] = pl[i];
 			}
 			startActivityForResult(new Intent(Player.this, CurrentlyPlaying.class)
-				.putExtra(PLAYLIST, playlist), 0);
+				.putExtra(PLAYLIST, playlist).putExtra(PlayerService.PLAYLIST_POSITION, player.getPosition()), 0);
 		}
 	};
 	

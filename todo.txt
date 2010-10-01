@@ -54,3 +54,23 @@ should everybody talk to the player service for metadata?
 "current list"is calling the service/player with song/playlist args, so the orientation switch bug hapens there
 should current list talk directly to service to get current playlist?
 option to save current playlist, if it's been modified? option to move/remove from current playlist -- s/playlist/currently playing/g
+
+
+
+
+	
+	void setAlbumArt(long albumId) {//TODO
+		ImageView albumArt = (ImageView) findViewById(R.id.albumArt);
+		Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+		Uri uri = ContentUris.withAppendedId(sArtworkUri, albumId);
+		ContentResolver res = this.getContentResolver();
+		InputStream in = null;
+		try {
+			in = res.openInputStream(uri);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Bitmap artwork = BitmapFactory.decodeStream(in);
+		albumArt.setImageBitmap(artwork);
+	}
