@@ -105,7 +105,6 @@ public class SongList extends ListActivity {
 		service.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		c.startService(service);
 		Intent i = new Intent(c, Player.class);
-		i.putExtra(Media._ID, id);
 		c.startActivityForResult(i, PLAY_SONG);
 	}//TODO refactor can't have this copy paste BS
 	
@@ -114,7 +113,6 @@ public class SongList extends ListActivity {
 		service.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		c.startService(service);
 		Intent i = new Intent(c, Player.class);
-		i.putExtra(Media._ID, id);
 		c.startActivityForResult(i, PLAY_SONG);
 	}
 }

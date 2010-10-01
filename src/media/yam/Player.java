@@ -118,11 +118,6 @@ public class Player extends Activity {
 	    
 	    
 		extras = getIntent().getExtras();
-		//setMeta(player.getCurrentSong()); -- erase next lines
-		if(extras != null) {
-			SongInfo song = MediaDB.getSong(getContentResolver(), extras.getLong(Media._ID));
-			setMeta(song);
-		}
 	}
 
 	@Override
@@ -141,11 +136,16 @@ public class Player extends Activity {
 		((TextView) findViewById(R.id.songProgress)).setText(
 				DateFormat.format("m:ss", c) + "/" + DateFormat.format("m:ss", d));
 		
+		int remaining = 1000 - (player.getCurrentPosition() % 1000);
+		if(!player.isPlaying()) {
+			remaining = 500;			
+		}
+		
 		handler.postDelayed(new Runnable() {
 			public void run() {
 				refreshInfo();
 			}
-		},500);
+		},remaining);
 	}
 	
 	void setMeta(Bundle extras) {
@@ -180,6 +180,7 @@ public class Player extends Activity {
 	private ServiceConnection playerConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			player = ((PlayerService.LocalBinder)service).getService();
+			setMeta(player.getCurrentSong());
 			refreshInfo();
 		}
 		public void onServiceDisconnected(ComponentName name) {
