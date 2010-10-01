@@ -126,17 +126,24 @@ public class Player extends Activity {
 	}
 	
 	void setMeta(Bundle extras) {
-		setMeta(extras.getString("title"), extras.getString("album"), extras.getString("artist"));
+		setMeta(extras.getString("title"), extras.getString("album"), 
+				extras.getString("artist"), extras.getLong("albumId"));
 	}
 	
 	void setMeta(SongInfo si) {
-		setMeta(si.title, si.album, si.artist);
+		setMeta(si.title, si.album, si.artist, si.albumId);
 	}
 	
-	void setMeta(String title, String album, String artist) {
+	void setMeta(String title, String album, String artist, long albumId) {
 		songTitle.setText(title);
 		songAlbum.setText(album);
 		songArtist.setText(artist);
+		setAlbumArt(albumId);
+	}
+	
+	void setAlbumArt(long albumId) {//TODO
+		ImageView albumArt = (ImageView) findViewById(R.id.albumArt);
+		albumArt.setImageBitmap(MediaDB.getAlbumArt(getContentResolver(), albumId));
 	}
 	
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

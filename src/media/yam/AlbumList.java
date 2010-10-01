@@ -41,7 +41,7 @@ public class AlbumList extends ListActivity {
         }
         Cursor c = getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, 
         		new String[]{Media._ID, Media.ALBUM}, selection, null, null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.album, c, 
         		new String[]{Media.ALBUM}, new int[]{R.id.song_title});
         setListAdapter(adapter);
 

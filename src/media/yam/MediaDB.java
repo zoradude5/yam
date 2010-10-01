@@ -1,12 +1,18 @@
 package media.yam;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.Media;
 import android.util.Log;
@@ -83,12 +89,13 @@ public class MediaDB {
     }
     
     public static class SongInfo {
-    	long id;
+    	long id, albumId;
     	String title, album, artist;
-    	SongInfo(String artist, String album, String title) {
+    	SongInfo(String artist, String album, String title, long albumId) {
     		this.artist = artist;
     		this.album = album;
     		this.title = title;
+    		this.albumId = albumId;
     	}
     	public String toString() {
     		return title;
@@ -97,13 +104,27 @@ public class MediaDB {
     
     public static SongInfo getSong(ContentResolver cr, long id) {
     	Cursor c = cr.query(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, String.valueOf(id)), 
-			new String[]{Media.ARTIST, Media.ALBUM, Media.TITLE}, 
+			new String[]{Media.ARTIST, Media.ALBUM, Media.TITLE, Media.ALBUM_ID}, 
 			null, null, null);
     	c.moveToFirst();
-    	SongInfo si = new SongInfo(c.getString(0), c.getString(1), c.getString(2));
+    	SongInfo si = new SongInfo(c.getString(0), c.getString(1), c.getString(2), c.getLong(3));
     	si.id = id;
     	c.close();
     	return si;
     }
+
+	public static Bitmap getAlbumArt(ContentResolver cr, long albumId) {
+		Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+		Uri uri = ContentUris.withAppendedId(sArtworkUri, albumId);
+		InputStream in = null;
+		try {
+			in = cr.openInputStream(uri);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Bitmap artwork = BitmapFactory.decodeStream(in);
+		return artwork;
+	}
 
 }

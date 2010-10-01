@@ -115,6 +115,7 @@ public class PlayerService extends Service {
 		i.putExtra("artist", currentSong.artist);
 		i.putExtra("album",currentSong.album);
 		i.putExtra("title",currentSong.title);
+		i.putExtra("albumId",currentSong.albumId);
 		sendBroadcast(i);
 		//this should move to play, but the issue is play after a pause -- we don't wnat to start form the beginning after a pause
 		play();

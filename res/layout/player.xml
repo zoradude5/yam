@@ -35,8 +35,8 @@
 	/>
 <ImageView
 	android:id="@+id/albumArt"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+  	android:layout_width="220dip"
+	android:layout_height="220dip"
     android:layout_below="@id/currentButton" 
     />
     <!-- 
