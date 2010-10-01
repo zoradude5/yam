@@ -113,6 +113,7 @@ public class Player extends Activity {
 	    
 	    
 		extras = getIntent().getExtras();
+		//setMeta(player.getCurrentSong()); -- erase next lines
 		if(extras != null) {
 			SongInfo song = MediaDB.getSong(getContentResolver(), extras.getLong(Media._ID));
 			setMeta(song);

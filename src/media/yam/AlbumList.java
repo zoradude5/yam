@@ -1,21 +1,26 @@
 package media.yam;
 
+import java.util.HashMap;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Media;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
-public class AlbumList extends ListActivity {
+public class AlbumList<K> extends ListActivity {
 	private static final int PLAY_SONG = 1;
 	
 	private Bundle extras;
@@ -38,10 +43,40 @@ public class AlbumList extends ListActivity {
         if(extras.containsKey(Media.ARTIST_ID)) {
         	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
         }
+        final HashMap<Long, Bitmap> albumArt = new HashMap<Long, Bitmap>();
         Cursor c = getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, 
         		new String[]{Media._ID, Media.ALBUM}, selection, null, null);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.album, c, 
-        		new String[]{Media.ALBUM}, new int[]{R.id.song_title});
+        		new String[]{Media.ALBUM, Media._ID}, new int[]{R.id.song_title, R.id.albumArt});
+        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+				if(columnIndex == cursor.getColumnIndexOrThrow(Media._ID)) {
+					long albumId = cursor.getLong(cursor.getColumnIndexOrThrow(Media._ID));
+					Bitmap b = null;
+					ImageView v = (ImageView) view;
+					if(albumArt.containsKey(albumId)) {
+						b = albumArt.get(albumId);
+						if(b == null) {
+							return true;
+						}
+					}
+					else {
+						Bitmap big = MediaDB.getAlbumArt(getContentResolver(), albumId);
+						if(big == null) {
+							return true;
+						}
+						b = Bitmap.createScaledBitmap(big, 50, 50, false);
+						big.recycle();
+						albumArt.put(albumId, b);
+					}
+					v.setImageBitmap(b);
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+		});
         setListAdapter(adapter);
 
         lv.setOnItemClickListener(new OnItemClickListener() {

@@ -36,159 +36,173 @@ public class PlayerService extends Service {
 	public static final String ACTION_PAUSE = "media.yam.action.PAUSE";
 	public static final String ACTION_PLAY = "media.yam.action.PLAY";
 	public static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
-	
+
 	public static final String METADATA_CHANGED = "media.yam.broadcast.METADATA_CHANGED";
-	
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if(mp == null) {
+		if (mp == null) {
 			mp = new MultiPlayer();
 		}
-		nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		db = new MediaDB(this);
 		db.open();
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
-		if(extras != null) {
-			if(ACTION_PLAY_NEXT.equals(intent.getAction())) {
-				if(extras.containsKey(Media._ID)) {
+		if (extras != null) {
+			if (ACTION_PLAY_NEXT.equals(intent.getAction())) {
+				if (extras.containsKey(Media._ID)) {
 					playNext(extras.getLong(Media._ID));
 				}
 			}
 			boolean changes = false;
-			if(extras.containsKey(Media.ARTIST_ID)) {
-				if(playlistType != Media.ARTIST_ID || playlistId != extras.getLong(Media.ARTIST_ID)) {
+			if (extras.containsKey(Media.ARTIST_ID)) {
+				if (playlistType != Media.ARTIST_ID
+						|| playlistId != extras.getLong(Media.ARTIST_ID)) {
 					playlistType = Media.ARTIST_ID;
 					playlistId = extras.getLong(Media.ARTIST_ID);
-					Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-							new String[]{Media._ID}, Media.ARTIST_ID + "=?", 
-							new String[]{String.valueOf(extras.getLong(Media.ARTIST_ID))}, null);
+					Cursor results = getContentResolver().query(
+							Media.EXTERNAL_CONTENT_URI,
+							new String[] { Media._ID },
+							Media.ARTIST_ID + "=?",
+							new String[] { String.valueOf(extras
+									.getLong(Media.ARTIST_ID)) }, null);
 					setPlaylist(results);
 					results.close();
 					changes = true;
 				}
-			}
-			else if(extras.containsKey(Media.ALBUM_ID)) {
-				if(playlistType != Media.ALBUM_ID || playlistId != extras.getLong(Media.ALBUM_ID)) {
+			} else if (extras.containsKey(Media.ALBUM_ID)) {
+				if (playlistType != Media.ALBUM_ID
+						|| playlistId != extras.getLong(Media.ALBUM_ID)) {
 					playlistType = Media.ALBUM_ID;
 					playlistId = extras.getLong(Media.ALBUM_ID);
-					Cursor results = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-							new String[]{Media._ID}, Media.ALBUM_ID + "=?", 
-							new String[]{String.valueOf(extras.getLong(Media.ALBUM_ID))}, null);
+					Cursor results = getContentResolver().query(
+							Media.EXTERNAL_CONTENT_URI,
+							new String[] { Media._ID },
+							Media.ALBUM_ID + "=?",
+							new String[] { String.valueOf(extras
+									.getLong(Media.ALBUM_ID)) }, null);
 					setPlaylist(results);
 					results.close();
 					changes = true;
 				}
 			}
-			
-			if(extras.containsKey(PLAYLIST_POSITION)) {
-				if(position != extras.getInt(PLAYLIST_POSITION)) {
+
+			if (extras.containsKey(PLAYLIST_POSITION)) {
+				if (position != extras.getInt(PLAYLIST_POSITION)) {
 					position = extras.getInt(PLAYLIST_POSITION);
 					changes = true;
 				}
 			}
-			
-			if(changes) {
+
+			if (changes) {
 				changeSong();
 			}
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
-	
+
 	void changeSong() {
-		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, 
+		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI,
 				String.valueOf(playlist.get(position))).toString());
 		mp.prepare();
-		currentSong = MediaDB.getSong(getContentResolver(), playlist.get(position));
+		currentSong = MediaDB.getSong(getContentResolver(),
+				playlist.get(position));
 
 		Intent i = new Intent(METADATA_CHANGED);
 		i.putExtra("id", Long.valueOf(currentSong.id));
 		i.putExtra("artist", currentSong.artist);
-		i.putExtra("album",currentSong.album);
-		i.putExtra("title",currentSong.title);
-		i.putExtra("albumId",currentSong.albumId);
+		i.putExtra("album", currentSong.album);
+		i.putExtra("title", currentSong.title);
+		i.putExtra("albumId", currentSong.albumId);
 		sendBroadcast(i);
-		//this should move to play, but the issue is play after a pause -- we don't wnat to start form the beginning after a pause
+		// this should move to play, but the issue is play after a pause -- we
+		// don't wnat to start form the beginning after a pause
 		play();
 	}
 
 	void play() {
 		mp.play();
-		Notification n = new Notification(); // make notification a static variable thing? a TODO
+		Notification n = new Notification(); // make notification a static
+												// variable thing? a TODO
 		n.icon = R.drawable.icon;
-		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
+		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this,
+				Player.class), 0);
 		n.flags |= Notification.FLAG_ONGOING_EVENT;
 		n.setLatestEventInfo(this, currentSong.title, currentSong.artist, pi);
 		startForeground(0, n);
 		nm.notify(0, n);
 	}
-	
+
 	void pause() {
 		mp.pause();
 		nm.cancel(0);
 		stopForeground(true);
 	}
-	
+
 	void seekPercent(int percent) {
-		int newTime = (int) (percent * mp.duration() / 100); 
+		int newTime = (int) (percent * mp.duration() / 100);
 		mp.seek(newTime);
 	}
-	
+
 	boolean isPlaying() {
 		return mp.isPlaying();
 	}
-	
+
 	public int getPosition() {
 		return this.position;
 	}
-	
+
 	void next() {
-		if(shuffle) {
-			
-		}
-		else { // this should only happen in case of repeat!!!!! remove this soon TODO TODO
-			if(position == playlist.size() - 1) {
-				position = 0; 
-			}
-			else {
+		if (shuffle) {
+
+		} else { // this should only happen in case of repeat!!!!! remove this
+					// soon TODO TODO
+			if (position == playlist.size() - 1) {
+				position = 0;
+			} else {
 				position++;
 			}
 			changeSong();
 		}
 	}
-	
+
 	void setPlaylist(Long[] playlist) {
 		this.playlist = Arrays.asList(playlist);
 	}
-	
+
 	void setPlaylist(Cursor results) {
-		if(results.getCount() > 0) {
+		if (results.getCount() > 0) {
 			playlist = new ArrayList<Long>(results.getCount());
 			results.moveToFirst();
 			do {
-				playlist.add(results.getLong(results.getColumnIndexOrThrow(Media._ID)));
-			} while(results.moveToNext());
-		}
-		else {
-			Log.w(PlayerService.class.getSimpleName(), "Service was given a query that produced no results. ");
+				playlist.add(results.getLong(results
+						.getColumnIndexOrThrow(Media._ID)));
+			} while (results.moveToNext());
+		} else {
+			Log.w(PlayerService.class.getSimpleName(),
+					"Service was given a query that produced no results. ");
 		}
 	}
-	
-	void playNext(long song) {//untested TODO
+
+	void playNext(long song) {// untested TODO
 		playlist.add(position + 1, song);
 	}
-	
+
 	void appendToPlaylist(long song) {
 		playlist.add(song);
 	}
 
 	public Long[] getPlaylist() {
-		return playlist.toArray(new Long[]{});
+		return playlist.toArray(new Long[] {});
+	}
+	
+	public SongInfo getCurrentSong() {
+		return currentSong;
 	}
 
 	@Override
@@ -198,7 +212,7 @@ public class PlayerService extends Service {
 		mp.release();
 		db.close();
 	}
-	
+
 	MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
 		@Override
 		public void onCompletion(MediaPlayer mediaPlayer) {
@@ -206,18 +220,18 @@ public class PlayerService extends Service {
 			next();
 		}
 	};
-	
+
 	private class MultiPlayer {
 		private MediaPlayer mp = new MediaPlayer();
 		private boolean initialized = false;
 		private boolean playing = false;
-		
+
 		public MultiPlayer() {
 			mp.setOnCompletionListener(completionListener);
 		}
-		
+
 		void setDataSource(String path) {
-			if(this.isInitialized() || this.isPlaying()) {
+			if (this.isInitialized() || this.isPlaying()) {
 				mp.reset();
 				initialized = false;
 				playing = false;
@@ -235,8 +249,9 @@ public class PlayerService extends Service {
 				e.printStackTrace();
 			}
 		}
-		
-		void prepare() { // I'm only keeping this separate because I want to consider async prep
+
+		void prepare() { // I'm only keeping this separate because I want to
+							// consider async prep
 			try {
 				mp.prepare();
 			} catch (IllegalStateException e) {
@@ -248,37 +263,37 @@ public class PlayerService extends Service {
 			}
 			this.initialized = true;
 		}
-		
+
 		void play() {
-			if(this.isInitialized()) {
+			if (this.isInitialized()) {
 				mp.start();
 				playing = true;
 			}
 		}
-		
+
 		void pause() {
-			if(this.isInitialized()) {
+			if (this.isInitialized()) {
 				mp.pause();
 				playing = false;
 			}
 		}
-		
+
 		void seek(int msec) {
 			mp.seekTo(msec);
 		}
-		
+
 		long duration() {
 			return mp.getDuration();
 		}
-		
+
 		boolean isInitialized() {
 			return initialized;
 		}
-		
+
 		boolean isPlaying() {
 			return playing;
 		}
-		
+
 		void release() {
 			mp.stop();
 			mp.release();
@@ -286,17 +301,17 @@ public class PlayerService extends Service {
 		}
 	}
 
-    private final IBinder mBinder = new LocalBinder();
-	
+	private final IBinder mBinder = new LocalBinder();
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return mBinder;
 	}
-	
-    public class LocalBinder extends Binder {
-    	PlayerService getService() {
-            return PlayerService.this;
-        }
-    }
+
+	public class LocalBinder extends Binder {
+		PlayerService getService() {
+			return PlayerService.this;
+		}
+	}
 
 }
