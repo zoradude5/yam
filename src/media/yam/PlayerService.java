@@ -144,8 +144,8 @@ public class PlayerService extends Service {
 		stopForeground(true);
 	}
 
-	void seekPercent(int percent) {
-		int newTime = (int) (percent * mp.duration() / 100);
+	void seekPercent(int progress, int max) {
+		int newTime = progress * mp.duration() / max;
 		mp.seek(newTime);
 	}
 
@@ -199,6 +199,14 @@ public class PlayerService extends Service {
 
 	public Long[] getPlaylist() {
 		return playlist.toArray(new Long[] {});
+	}
+
+	public int getCurrentPosition() {
+		return mp.currentPosition();
+	}
+
+	public int getDuration() {
+		return mp.duration();
 	}
 	
 	public SongInfo getCurrentSong() {
@@ -282,8 +290,12 @@ public class PlayerService extends Service {
 			mp.seekTo(msec);
 		}
 
-		long duration() {
+		int duration() {
 			return mp.getDuration();
+		}
+
+		int currentPosition() {
+			return mp.getCurrentPosition();
 		}
 
 		boolean isInitialized() {

@@ -3,10 +3,16 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+<TextView
+	android:id="@+id/songProgress"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+	/>
 <SeekBar
 	android:id="@+id/seekBar"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:layout_below="@id/songProgress" 
     />
 <Button
 	android:id="@+id/currentButton"

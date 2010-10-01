@@ -3,6 +3,7 @@ package media.yam;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Calendar;
 
 import media.yam.MediaDB.SongInfo;
 
@@ -19,8 +20,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore.Audio.Media;
+import android.text.format.DateFormat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -39,6 +42,7 @@ public class Player extends Activity {
 	private TextView songTitle;
 	private TextView songAlbum;
 	private TextView songArtist;
+	private SeekBar seekBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +108,9 @@ public class Player extends Activity {
 		});
 	    Button current = (Button) findViewById(R.id.currentButton);
 	    current.setOnClickListener(currentOnClickListener);
-	    SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
+	    seekBar = (SeekBar) findViewById(R.id.seekBar);
 	    seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+	    seekBar.setMax(1000);
 
 	    songTitle = (TextView) Player.this.findViewById(R.id.songTitle);
 	    songAlbum = (TextView) Player.this.findViewById(R.id.songAlbum);
@@ -124,6 +129,23 @@ public class Player extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 	    doUnbindService();
+	}
+	
+	void refreshInfo() {
+		seekBar.setProgress(player.getCurrentPosition() * seekBar.getMax() / player.getDuration() );
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(player.getCurrentPosition());
+		Calendar d = Calendar.getInstance();
+		d.setTimeInMillis(player.getDuration());
+		
+		((TextView) findViewById(R.id.songProgress)).setText(
+				DateFormat.format("m:ss", c) + "/" + DateFormat.format("m:ss", d));
+		
+		handler.postDelayed(new Runnable() {
+			public void run() {
+				refreshInfo();
+			}
+		},500);
 	}
 	
 	void setMeta(Bundle extras) {
@@ -158,6 +180,7 @@ public class Player extends Activity {
 	private ServiceConnection playerConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			player = ((PlayerService.LocalBinder)service).getService();
+			refreshInfo();
 		}
 		public void onServiceDisconnected(ComponentName name) {
 			player = null;
@@ -226,7 +249,12 @@ public class Player extends Activity {
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
-			player.seekPercent(progress);
+			if(!fromUser) return;
+			if(player != null) {
+				player.seekPercent(progress,seekBar.getMax());
+			}
 		}
 	};
+	
+	Handler handler = new Handler();
 }

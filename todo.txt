@@ -59,3 +59,7 @@ option to save current playlist, if it's been modified? option to move/remove fr
 
 
 	should currently playing return the playlist position? (call finish(), hav ethe call picked up by player)
+
+replace current meta on start fix with something that waits for service!
+or asks service if the service is already bound.
+issue when you click on ongoing notification -- goes to empty player, since there's no id arg
