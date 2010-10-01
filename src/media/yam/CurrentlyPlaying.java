@@ -12,12 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 public class CurrentlyPlaying extends ListActivity {
+	private SongInfo[] playlist;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		long[] playlist1 = getIntent().getExtras().getLongArray(Player.PLAYLIST);
 		int position = getIntent().getExtras().getInt(PlayerService.PLAYLIST_POSITION);
-		final SongInfo[] playlist = new SongInfo[playlist1.length];
+		playlist = new SongInfo[playlist1.length];
 		for(int i = 0; i < playlist1.length; i++) {
 			playlist[i] = MediaDB.getSong(getContentResolver(), playlist1[i]);
 		}
@@ -36,8 +38,7 @@ public class CurrentlyPlaying extends ListActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
-				startActivityForResult(new Intent(CurrentlyPlaying.this, Player.class)
-					.putExtra(PlayerService.PLAYLIST_POSITION, position), 0);
+				SongList.startPlayer(CurrentlyPlaying.this, position, playlist[position].id);
 			}
 		});
 		setSelection(position);

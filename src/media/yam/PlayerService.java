@@ -85,10 +85,6 @@ public class PlayerService extends Service {
 					changes = true;
 				}
 			}
-			else if(extras.containsKey(SongList.KEY_PATH)) {
-				setPlaylist(new Long[]{extras.getLong(SongList.KEY_PATH)});
-				changes = true;
-			}
 			
 			if(extras.containsKey(PLAYLIST_POSITION)) {
 				if(position != extras.getInt(PLAYLIST_POSITION)) {

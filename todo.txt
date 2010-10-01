@@ -58,19 +58,4 @@ option to save current playlist, if it's been modified? option to move/remove fr
 
 
 
-	
-	void setAlbumArt(long albumId) {//TODO
-		ImageView albumArt = (ImageView) findViewById(R.id.albumArt);
-		Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-		Uri uri = ContentUris.withAppendedId(sArtworkUri, albumId);
-		ContentResolver res = this.getContentResolver();
-		InputStream in = null;
-		try {
-			in = res.openInputStream(uri);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Bitmap artwork = BitmapFactory.decodeStream(in);
-		albumArt.setImageBitmap(artwork);
-	}
+	should currently playing return the playlist position? (call finish(), hav ethe call picked up by player)

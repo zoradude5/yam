@@ -1,6 +1,8 @@
 package media.yam;
 
+import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,8 +20,6 @@ import android.widget.SimpleCursorAdapter;
 
 public class SongList extends ListActivity {
 	private static final int PLAY_SONG = 1;
-	
-	public static final String KEY_PATH = "path";
 	
 	private static final int MENU_PLAY_NOW = Menu.FIRST;
 	private static final int MENU_PLAY_NEXT = Menu.FIRST + 1;
@@ -91,21 +91,30 @@ public class SongList extends ListActivity {
 
 
 	private void launchPlayer(int position, long id) {
-		Intent service = new Intent(this, PlayerService.class);
 		if(extras.containsKey(Media.ARTIST_ID)) {
-			service.putExtra(Media.ARTIST_ID, extras.getLong(Media.ARTIST_ID));
-			service.putExtra(PlayerService.PLAYLIST_POSITION, position);
+			startPlayer(this, extras, Media.ARTIST_ID, position, id);
 		}
 		else if(extras.containsKey(Media.ALBUM_ID)) {
-			service.putExtra(Media.ALBUM_ID, extras.getLong(Media.ALBUM_ID));
-			service.putExtra(PlayerService.PLAYLIST_POSITION, position);
+			startPlayer(this, extras, Media.ALBUM_ID, position, id);
 		}
-		else {
-			service.putExtra(KEY_PATH, position);
-		}
-		startService(service);
-		Intent i = new Intent(this, Player.class);
+	}
+	
+	public static void startPlayer(Activity c, Bundle extras, String key, int position, long id) {
+		Intent service = new Intent(c, PlayerService.class);
+		service.putExtra(key, extras.getLong(key));
+		service.putExtra(PlayerService.PLAYLIST_POSITION, position);
+		c.startService(service);
+		Intent i = new Intent(c, Player.class);
 		i.putExtra(Media._ID, id);
-		startActivityForResult(i, PLAY_SONG);
+		c.startActivityForResult(i, PLAY_SONG);
+	}//TODO refactor can't have this copy paste BS
+	
+	public static void startPlayer(Activity c, int position, long id) {
+		Intent service = new Intent(c, PlayerService.class);
+		service.putExtra(PlayerService.PLAYLIST_POSITION, position);
+		c.startService(service);
+		Intent i = new Intent(c, Player.class);
+		i.putExtra(Media._ID, id);
+		c.startActivityForResult(i, PLAY_SONG);
 	}
 }
