@@ -31,59 +31,37 @@ public class AlbumList<K> extends ListActivity {
         setContentView(R.layout.songs);
         extras = getIntent().getExtras();
         
-        ListView lv = getListView();
-        LayoutInflater li = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View allSongs = li.inflate(R.layout.song, null);
-        ((TextView)allSongs.findViewById(R.id.song_title)).setText("All Songs");
-        lv.addHeaderView(allSongs);
-        lv.setTextFilterEnabled(true);
-        
         String selection = null;
-        if(extras.containsKey(Media.ARTIST_ID)) {
+        String orderBy = null;
+        
+        if(extras != null && extras.containsKey(Media.ARTIST_ID)) {
         	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
+            
+            ListView lv = getListView();
+            LayoutInflater li = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View allSongs = li.inflate(R.layout.song, null);
+            ((TextView)allSongs.findViewById(R.id.song_title)).setText("All Songs");
+            lv.addHeaderView(allSongs);
+            lv.setTextFilterEnabled(true);
+
+            lv.setOnItemClickListener(new OnItemClickListener() {
+              public void onItemClick(AdapterView<?> parent, View view,
+                  int position, long id) {
+            	  launchArtistsSongs(id);
+              }
+            });
         }
-        final HashMap<Long, Bitmap> albumArt = new HashMap<Long, Bitmap>();
+        else {
+        	orderBy = Media.ALBUM;
+        }
+        
+        
         Cursor c = getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, 
-        		new String[]{Media._ID, Media.ALBUM}, selection, null, null);
+        		new String[]{Media._ID, Media.ALBUM}, selection, null, orderBy);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.album, c, 
         		new String[]{Media.ALBUM, Media._ID}, new int[]{R.id.song_title, R.id.albumArt});
-        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-				if(columnIndex == cursor.getColumnIndexOrThrow(Media._ID)) {
-					long albumId = cursor.getLong(cursor.getColumnIndexOrThrow(Media._ID));
-					Bitmap b = null;
-					ImageView v = (ImageView) view;
-					if(albumArt.containsKey(albumId)) {
-						b = albumArt.get(albumId);
-						if(b == null) {
-							return true;
-						}
-					}
-					else {
-						Bitmap big = MediaDB.getAlbumArt(getContentResolver(), albumId);
-						if(big == null) {
-							return true;
-						}
-						b = Bitmap.createScaledBitmap(big, 50, 50, false);
-						big.recycle();
-						albumArt.put(albumId, b);
-					}
-					v.setImageBitmap(b);
-					return true;
-				}
-				else {
-					return false;
-				}
-			}
-		});
+        adapter.setViewBinder(albumArtViewBinder);
         setListAdapter(adapter);
-
-        lv.setOnItemClickListener(new OnItemClickListener() {
-          public void onItemClick(AdapterView<?> parent, View view,
-              int position, long id) {
-        	  launchArtistsSongs(id);
-          }
-        });
     }
     
 
@@ -98,5 +76,42 @@ public class AlbumList<K> extends ListActivity {
 		}
 		startActivityForResult(i, PLAY_SONG);
 	}
+	
+
+    final HashMap<Long, Bitmap> albumArt = new HashMap<Long, Bitmap>();
+	SimpleCursorAdapter.ViewBinder albumArtViewBinder = new SimpleCursorAdapter.ViewBinder() {
+		public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+			if(columnIndex == cursor.getColumnIndexOrThrow(Media._ID)) {
+				long albumId = cursor.getLong(cursor.getColumnIndexOrThrow(Media._ID));
+				Bitmap b = null;
+				ImageView v = (ImageView) view;
+				/*
+				if(albumArt.containsKey(albumId)) {
+					b = albumArt.get(albumId);
+					if(b == null) {
+						return true;
+					}
+				}
+				else {
+					Bitmap big = MediaDB.getAlbumArt(getContentResolver(), albumId);
+					if(big == null) {
+						return true;
+					}
+					b = Bitmap.createScaledBitmap(big, 50, 50, false);
+					big.recycle();
+					albumArt.put(albumId, b);
+				}
+				v.setImageBitmap(b);
+				*/
+				Bitmap big = MediaDB.getAlbumArt(getContentResolver(), albumId);
+				v.setImageBitmap(big);
+				
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	};
 
 }

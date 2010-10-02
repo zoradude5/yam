@@ -36,14 +36,18 @@ public class SongList extends ListActivity {
         
         String selection = null;
         String orderBy = null;
-        
-        if(extras.containsKey(Media.ARTIST_ID)) {
-        	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
-        	orderBy = Media.TITLE;
+        if(extras != null) {
+	        if(extras.containsKey(Media.ARTIST_ID)) {
+	        	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
+	        	orderBy = Media.TITLE;
+	        }
+	        else if(extras.containsKey(Media.ALBUM_ID)) {
+	        	selection = Media.ALBUM_ID + "=" + extras.getLong(Media.ALBUM_ID);
+	        	orderBy = Media.TRACK;
+	        }
         }
-        else if(extras.containsKey(Media.ALBUM_ID)) {
-        	selection = Media.ALBUM_ID + "=" + extras.getLong(Media.ALBUM_ID);
-        	orderBy = Media.TRACK;
+        else {
+        	orderBy = Media.TITLE;
         }
         
         

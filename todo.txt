@@ -7,10 +7,9 @@ move items around in current playlist view (like doubletwist)
 skip count increment -- do it in the right places
 filtering based on counts/skips
 foreground process -- notification bar, so we don't get killed ?? how do we do this ?? I'm simmingish it now
-start foreground issue -- is that because service is in the same process/thread? -- killing player kills service/playing
+start foreground issue -- is that because service is in the same process/thread? -- killing player kills service/playing -- fix! aidl
 lifecycle stuff
 let go of resources during onpause/ondestroy!!!!
-broadcast album/artist/song changes?
 
 
 I would prefer sectioning to make position on scroll thing be equal for every section... so m is halfway down.g is a quarter down. right now, "section" from toolbar is based on where that section starts ont he list
@@ -22,11 +21,7 @@ lock screen
 widget
 
 I need titles on artist/album/song pages. I need pretty buttons!
-Unplug headphones
-
-Phone calls
 callback from service? sets play/pause button
-Make the scroll box bounce
 Currently playing should be on player, in notification, and currently playing song should have an icon
 
 Custom playlists
@@ -47,3 +42,5 @@ delete song from sd card? what happens to our playlist?
 // do something smarter here [player service's next+shuffle+repeat] so you don't get repeats? TODO
 
 consider imagebutton instead of imageview. it makes a pretty button thing.
+
+fade in after a phone call?
