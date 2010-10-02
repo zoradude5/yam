@@ -1,10 +1,7 @@
-play time/ seek bar update
 move bar doesn't cause weird sound artifacts
 have current song/album/artist be highlighted/icon'd in various views
 prev
 repeat
-shuffle (selection without replacement?)
- add to end of current playlist
 support for playlists on device
 move items around in current playlist view (like doubletwist)
 skip count increment -- do it in the right places
@@ -36,11 +33,7 @@ Unplug headphones
 
 Phone calls
 callback from service? sets play/pause button
-Pause during notifications? 
 Make the scroll box bounce
-Artist info
-Remove bad buttons
-Shuffle, repeat
 Currently playing should be on player, in notification, and currently playing song should have an icon
 
 Custom playlists

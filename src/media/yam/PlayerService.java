@@ -13,6 +13,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -21,6 +22,8 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore.Audio.Media;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class PlayerService extends Service {
@@ -53,6 +56,22 @@ public class PlayerService extends Service {
 		nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		db = new MediaDB(this);
 		db.open();
+
+		TelephonyManager telephony = (TelephonyManager)
+			this.getSystemService(Context.TELEPHONY_SERVICE);
+		telephony.listen(new PhoneStateListener() {
+			public void onCallStateChanged(int state, String incomingNumber) {
+				super.onCallStateChanged(state, incomingNumber);
+				switch(state) {
+				case TelephonyManager.CALL_STATE_IDLE:
+					play();
+					break;
+				default:
+					pause();
+					break;
+				}
+			}
+		}, PhoneStateListener.LISTEN_CALL_STATE);
 	}
 
 	@Override
