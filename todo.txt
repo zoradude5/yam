@@ -5,7 +5,6 @@ repeat
 support for playlists on device
 move items around in current playlist view (like doubletwist)
 skip count increment -- do it in the right places
-record every play/time/duration instead of keeping count?
 filtering based on counts/skips
 foreground process -- notification bar, so we don't get killed ?? how do we do this ?? I'm simmingish it now
 start foreground issue -- is that because service is in the same process/thread? -- killing player kills service/playing
@@ -22,13 +21,7 @@ pretty ui for player
 lock screen
 widget
 
-
-Move screen sideways after skipping song. It restarts the song from the first one.
-
-alphabet thing
-
 I need titles on artist/album/song pages. I need pretty buttons!
-
 Unplug headphones
 
 Phone calls

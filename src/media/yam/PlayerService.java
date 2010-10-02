@@ -12,8 +12,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -55,6 +57,11 @@ public class PlayerService extends Service {
 		nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		db = new MediaDB(this);
 		db.open();
+		
+
+		IntentFilter f = new IntentFilter();
+		f.addAction(Intent.ACTION_HEADSET_PLUG);
+		registerReceiver(broadcastReceiver, new IntentFilter(f));
 
 		TelephonyManager telephony = (TelephonyManager)
 			this.getSystemService(Context.TELEPHONY_SERVICE);
@@ -300,6 +307,16 @@ public class PlayerService extends Service {
 		mp.release();
 		db.close();
 	}
+
+	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		public void onReceive(Context context, Intent intent) {
+			if(intent.getAction().equals(Intent.ACTION_HEADSET_PLUG)) {
+				if(intent.getExtras().getInt("state") == 0 && isPlaying()) {
+					pause();
+				}
+			}
+		}
+	};
 
 	MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
 		@Override

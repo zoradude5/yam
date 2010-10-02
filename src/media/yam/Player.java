@@ -147,6 +147,9 @@ public class Player extends Activity {
 			if(player.isPlaying()) {
 				setPauseButton();
 			}
+			else {
+				setPlayButton();
+			}
 		}
 		public void onServiceDisconnected(ComponentName name) {
 			player = null;
