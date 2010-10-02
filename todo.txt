@@ -1,8 +1,7 @@
 play time/ seek bar update
 move bar doesn't cause weird sound artifacts
-metadata for current song
+have current song/album/artist be highlighted/icon'd in various views
 prev
-for scroller thing with letter
 repeat
 shuffle (selection without replacement?)
  add to end of current playlist
@@ -36,7 +35,7 @@ I need titles on artist/album/song pages. I need pretty buttons!
 Unplug headphones
 
 Phone calls
-
+callback from service? sets play/pause button
 Pause during notifications? 
 Make the scroll box bounce
 Artist info
@@ -50,16 +49,13 @@ Keep track of play time of track in media player. (like total time. So skipping 
 
 key for counts in DB shouldn't be DB ID -- look for something that's unique to the song!!!!
 
-should everybody talk to the player service for metadata?
-"current list"is calling the service/player with song/playlist args, so the orientation switch bug hapens there
 should current list talk directly to service to get current playlist?
 option to save current playlist, if it's been modified? option to move/remove from current playlist -- s/playlist/currently playing/g
 
+for player activity:
+android:clearTaskOnLaunch
+android:taskAffinity
 
+delete song from sd card? what happens to our playlist?
 
-
-	should currently playing return the playlist position? (call finish(), hav ethe call picked up by player)
-
-replace current meta on start fix with something that waits for service!
-or asks service if the service is already bound.
-issue when you click on ongoing notification -- goes to empty player, since there's no id arg
+// do something smarter here [player service's next+shuffle+repeat] so you don't get repeats? TODO

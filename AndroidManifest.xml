@@ -13,7 +13,10 @@
         </activity>
         <activity android:name=".SongList" />
         <activity android:name=".AlbumList" />
-		<activity android:name=".Player" />
+		<activity android:name=".Player"
+			android:launchMode="singleTask"
+			android:screenOrientation="portrait"
+		/>
 		<activity android:name=".CurrentlyPlaying" />
 		<service android:name=".PlayerService" />
     </application>

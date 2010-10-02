@@ -39,11 +39,18 @@
     android:layout_height="wrap_content" 
     android:layout_below="@id/songAlbum" 
 	/>
+<Button
+	android:id="@+id/shuffleButton"
+	android:text="shuffle off"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:layout_below="@id/songArtist" 
+	/>
 <ImageView
 	android:id="@+id/albumArt"
   	android:layout_width="220dip"
 	android:layout_height="220dip"
-    android:layout_below="@id/songArtist" 
+    android:layout_below="@id/shuffleButton" 
     />
     <!-- 
 <ImageView

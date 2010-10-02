@@ -108,6 +108,20 @@ public class Player extends Activity {
 		});
 	    Button current = (Button) findViewById(R.id.currentButton);
 	    current.setOnClickListener(currentOnClickListener);
+	    
+	    final Button shuffleButton = (Button) findViewById(R.id.shuffleButton);
+	    shuffleButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				player.shuffleToggle();
+				if(player.getShuffle()) {
+					shuffleButton.setText("shuffle on");
+				}
+				else {
+					shuffleButton.setText("shuffle on");
+				}
+			}
+		});
+	    
 	    seekBar = (SeekBar) findViewById(R.id.seekBar);
 	    seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
 	    seekBar.setMax(1000);
@@ -203,7 +217,7 @@ public class Player extends Activity {
 	View.OnClickListener nextOnClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			player.next();
+			player.next(true);
 		}
 	};
 

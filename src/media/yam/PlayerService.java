@@ -3,7 +3,9 @@ package media.yam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import media.yam.MediaDB.SongInfo;
 
@@ -27,10 +29,13 @@ public class PlayerService extends Service {
 	private List<Long> playlist = new ArrayList<Long>();
 	private int position;
 	private boolean shuffle = false;
+	private boolean repeat = false;
 	private String playlistType;
 	private long playlistId;
 	private NotificationManager nm;
 	private SongInfo currentSong;
+	private List<Long> unplayed;
+	private Random rnd = new Random();
 
 	public static String PLAYLIST_POSITION = "position";
 	public static final String ACTION_PAUSE = "media.yam.action.PAUSE";
@@ -100,16 +105,17 @@ public class PlayerService extends Service {
 			}
 
 			if (changes) {
-				changeSong();
+				changeCurrentlyPlaying(true);
 			}
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	void changeSong() {
+	void changeCurrentlyPlaying(boolean play) {
 		mp.setDataSource(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI,
 				String.valueOf(playlist.get(position))).toString());
 		mp.prepare();
+
 		currentSong = MediaDB.getSong(getContentResolver(),
 				playlist.get(position));
 
@@ -120,15 +126,17 @@ public class PlayerService extends Service {
 		i.putExtra("title", currentSong.title);
 		i.putExtra("albumId", currentSong.albumId);
 		sendBroadcast(i);
+		
 		// this should move to play, but the issue is play after a pause -- we
 		// don't wnat to start form the beginning after a pause
-		play();
+		if(play)
+			play();
 	}
 
-	void play() {
+	void play() {		
 		mp.play();
 		Notification n = new Notification(); // make notification a static
-												// variable thing? a TODO
+												// variable thing?  TODO
 		n.icon = R.drawable.icon;
 		PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this,
 				Player.class), 0);
@@ -144,6 +152,68 @@ public class PlayerService extends Service {
 		stopForeground(true);
 	}
 
+	void next(boolean force) {//took idea for name "force" from music app
+		if (shuffle) {/// TODO
+			if(unplayed.size() == 0) {
+				shuffle = false;
+				shuffle();
+				int i = rnd.nextInt(unplayed.size());
+				this.position = playlist.indexOf(unplayed.get(i));
+				unplayed.remove(i);
+				if(repeat || force) {// do something smarter here so you don't get repeats? TODO
+					changeCurrentlyPlaying(true);
+				}
+				else {
+					changeCurrentlyPlaying(false);
+				}
+			}
+			else {
+				int i = rnd.nextInt(unplayed.size());
+				this.position = playlist.indexOf(unplayed.get(i));
+				unplayed.remove(i);
+				changeCurrentlyPlaying(true);
+			}
+		} else {
+			if (position == playlist.size() - 1) {
+				position = 0;
+				if(repeat || force) {
+					changeCurrentlyPlaying(true);
+				}
+				else {
+					pause();
+					changeCurrentlyPlaying(false);
+				}
+			} else {
+				position++;
+				changeCurrentlyPlaying(true);
+			}
+		}
+	}
+	
+	void shuffleToggle() {
+		if(shuffle) {
+			unshuffle();
+		}
+		else {
+			shuffle();
+		}
+	}
+	
+	boolean getShuffle() { return shuffle; }
+	
+	void shuffle() {
+		if(!shuffle) {
+			unplayed = new ArrayList<Long>();
+			unplayed.addAll(playlist);
+		}
+		shuffle = true;
+	}
+	
+	void unshuffle() {
+		unplayed = null;
+		shuffle = false;
+	}
+
 	void seekPercent(int progress, int max) {
 		int newTime = progress * mp.duration() / max;
 		mp.seek(newTime);
@@ -155,20 +225,6 @@ public class PlayerService extends Service {
 
 	public int getPosition() {
 		return this.position;
-	}
-
-	void next() {
-		if (shuffle) {
-
-		} else { // this should only happen in case of repeat!!!!! remove this
-					// soon TODO TODO
-			if (position == playlist.size() - 1) {
-				position = 0;
-			} else {
-				position++;
-			}
-			changeSong();
-		}
 	}
 
 	void setPlaylist(Long[] playlist) {
@@ -189,12 +245,11 @@ public class PlayerService extends Service {
 		}
 	}
 
-	void playNext(long song) {// untested TODO
+	void playNext(long song) {
 		playlist.add(position + 1, song);
-	}
-
-	void appendToPlaylist(long song) {
-		playlist.add(song);
+		if(shuffle) {
+			unplayed.add(song);
+		}
 	}
 
 	public Long[] getPlaylist() {
@@ -225,14 +280,13 @@ public class PlayerService extends Service {
 		@Override
 		public void onCompletion(MediaPlayer mediaPlayer) {
 			db.increment(playlist.get(position), MediaDB.ACTION_PLAY);
-			next();
+			next(false);
 		}
 	};
 
 	private class MultiPlayer {
 		private MediaPlayer mp = new MediaPlayer();
 		private boolean initialized = false;
-		private boolean playing = false;
 
 		public MultiPlayer() {
 			mp.setOnCompletionListener(completionListener);
@@ -242,7 +296,6 @@ public class PlayerService extends Service {
 			if (this.isInitialized() || this.isPlaying()) {
 				mp.reset();
 				initialized = false;
-				playing = false;
 			}
 			try {
 				mp.setDataSource(path);
@@ -275,14 +328,12 @@ public class PlayerService extends Service {
 		void play() {
 			if (this.isInitialized()) {
 				mp.start();
-				playing = true;
 			}
 		}
 
 		void pause() {
 			if (this.isInitialized()) {
 				mp.pause();
-				playing = false;
 			}
 		}
 
@@ -303,13 +354,13 @@ public class PlayerService extends Service {
 		}
 
 		boolean isPlaying() {
-			return playing;
+			return mp.isPlaying();
 		}
 
 		void release() {
 			mp.stop();
 			mp.release();
-			initialized = playing = false;
+			initialized = false;
 		}
 	}
 
