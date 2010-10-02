@@ -45,6 +45,9 @@ public class PlayerService extends Service {
 	public static final String ACTION_PAUSE = "media.yam.action.PAUSE";
 	public static final String ACTION_PLAY = "media.yam.action.PLAY";
 	public static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
+	public static final String ACTION_CHANGE_TRACK = "media.yam.action.CHANGE_TRACK";
+	public static final String ACTION_PLAY_ALBUM = "media.yam.action.PLAY_ALBUM";
+	public static final String ACTION_PLAY_ARTIST = "media.yam.action.PLAY_ARTIST";
 
 	public static final String METADATA_CHANGED = "media.yam.broadcast.METADATA_CHANGED";
 
@@ -91,54 +94,28 @@ public class PlayerService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
 		if (extras != null) {
-			if (ACTION_PLAY_NEXT.equals(intent.getAction())) {
+			String action = intent.getAction();
+			if (ACTION_PLAY_NEXT.equals(action)) {
 				if (extras.containsKey(Media._ID)) {
 					playNext(extras.getLong(Media._ID));
 				}
 			}
-			boolean changes = false;
-			if (extras.containsKey(Media.ARTIST_ID)) {
-				if (playlistType != Media.ARTIST_ID
-						|| playlistId != extras.getLong(Media.ARTIST_ID)) {
-					playlistType = Media.ARTIST_ID;
-					playlistId = extras.getLong(Media.ARTIST_ID);
-					Cursor results = getContentResolver().query(
-							Media.EXTERNAL_CONTENT_URI,
-							new String[] { Media._ID },
-							Media.ARTIST_ID + "=?",
-							new String[] { String.valueOf(extras
-									.getLong(Media.ARTIST_ID)) }, null);
-					setPlaylist(results);
-					results.close();
-					changes = true;
-				}
-			} else if (extras.containsKey(Media.ALBUM_ID)) {
-				if (playlistType != Media.ALBUM_ID
-						|| playlistId != extras.getLong(Media.ALBUM_ID)) {
-					playlistType = Media.ALBUM_ID;
-					playlistId = extras.getLong(Media.ALBUM_ID);
-					Cursor results = getContentResolver().query(
-							Media.EXTERNAL_CONTENT_URI,
-							new String[] { Media._ID },
-							Media.ALBUM_ID + "=?",
-							new String[] { String.valueOf(extras
-									.getLong(Media.ALBUM_ID)) }, null);
-					setPlaylist(results);
-					results.close();
-					changes = true;
-				}
+			else if(ACTION_PLAY_ARTIST.equals(action)) {
+				setPlaylist(extras, Media.ARTIST_ID, Media.TITLE);
 			}
-
-			if (extras.containsKey(PLAYLIST_POSITION)) {
-				if (position != extras.getInt(PLAYLIST_POSITION)) {
+			else if(ACTION_PLAY_ALBUM.equals(action)) {
+				setPlaylist(extras, Media.ALBUM_ID, Media.TRACK);
+			}
+			else if(ACTION_CHANGE_TRACK.equals(action)) {
+				if(position == extras.getInt(PLAYLIST_POSITION)) {
+					play();
+				}
+				else {
 					position = extras.getInt(PLAYLIST_POSITION);
-					changes = true;
+					changeCurrentlyPlaying(true);
 				}
 			}
-
-			if (changes) {
-				changeCurrentlyPlaying(true);
-			}
+			
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -272,8 +249,29 @@ public class PlayerService extends Service {
 						.getColumnIndexOrThrow(Media._ID)));
 			} while (results.moveToNext());
 		} else {
-			Log.w(PlayerService.class.getSimpleName(),
+			Log.e(PlayerService.class.getSimpleName(),
 					"Service was given a query that produced no results. ");
+		}
+	}
+
+	private void setPlaylist(Bundle extras, String key, String orderBy) {
+		if(key == playlistType && playlistId == extras.getLong(key) 
+				&& position == extras.getInt(PLAYLIST_POSITION)) {
+			play();
+		}
+		else {
+			playlistType = key;
+			playlistId = extras.getLong(key);
+			position = extras.getInt(PLAYLIST_POSITION);
+			Cursor results = getContentResolver().query(
+					Media.EXTERNAL_CONTENT_URI,
+					new String[] { Media._ID },
+					key + "=?",
+					new String[] { String.valueOf(extras
+							.getLong(key)) }, orderBy);
+			setPlaylist(results);
+			results.close();
+			changeCurrentlyPlaying(true);
 		}
 	}
 

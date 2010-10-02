@@ -33,23 +33,17 @@ public class AlbumList<K> extends ListActivity {
         
         String selection = null;
         String orderBy = null;
+        ListView lv = getListView();
         
         if(extras != null && extras.containsKey(Media.ARTIST_ID)) {
         	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
             
-            ListView lv = getListView();
             LayoutInflater li = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View allSongs = li.inflate(R.layout.song, null);
             ((TextView)allSongs.findViewById(R.id.song_title)).setText("All Songs");
             lv.addHeaderView(allSongs);
             lv.setTextFilterEnabled(true);
 
-            lv.setOnItemClickListener(new OnItemClickListener() {
-              public void onItemClick(AdapterView<?> parent, View view,
-                  int position, long id) {
-            	  launchArtistsSongs(id);
-              }
-            });
         }
         else {
         	orderBy = Media.ALBUM;
@@ -62,6 +56,12 @@ public class AlbumList<K> extends ListActivity {
         		new String[]{Media.ALBUM, Media._ID}, new int[]{R.id.song_title, R.id.albumArt});
         adapter.setViewBinder(albumArtViewBinder);
         setListAdapter(adapter);
+        lv.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                int position, long id) {
+          	  launchArtistsSongs(id);
+            }
+        });
     }
     
 

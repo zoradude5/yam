@@ -98,15 +98,16 @@ public class SongList extends ListActivity {
 
 	private void launchPlayer(int position, long id) {
 		if(extras.containsKey(Media.ARTIST_ID)) {
-			startPlayer(this, extras, Media.ARTIST_ID, position, id);
+			startPlayer(this, PlayerService.ACTION_PLAY_ARTIST, extras, Media.ARTIST_ID, position, id);
 		}
 		else if(extras.containsKey(Media.ALBUM_ID)) {
-			startPlayer(this, extras, Media.ALBUM_ID, position, id);
+			startPlayer(this, PlayerService.ACTION_PLAY_ALBUM, extras, Media.ALBUM_ID, position, id);
 		}
 	}
 	
-	public static void startPlayer(Activity c, Bundle extras, String key, int position, long id) {
+	public static void startPlayer(Activity c, String action, Bundle extras, String key, int position, long id) {
 		Intent service = new Intent(c, PlayerService.class);
+		service.setAction(action);
 		service.putExtra(key, extras.getLong(key));
 		service.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		c.startService(service);
@@ -116,6 +117,7 @@ public class SongList extends ListActivity {
 	
 	public static void startPlayer(Activity c, int position, long id) {
 		Intent service = new Intent(c, PlayerService.class);
+		service.setAction(PlayerService.ACTION_CHANGE_TRACK);
 		service.putExtra(PlayerService.PLAYLIST_POSITION, position);
 		c.startService(service);
 		Intent i = new Intent(c, Player.class);
