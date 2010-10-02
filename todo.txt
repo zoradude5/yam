@@ -52,3 +52,5 @@ android:taskAffinity
 delete song from sd card? what happens to our playlist?
 
 // do something smarter here [player service's next+shuffle+repeat] so you don't get repeats? TODO
+
+consider imagebutton instead of imageview. it makes a pretty button thing.

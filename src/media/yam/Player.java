@@ -31,6 +31,7 @@ public class Player extends Activity {
 	private TextView songAlbum;
 	private TextView songArtist;
 	private SeekBar seekBar;
+	private ImageView play;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,59 +43,12 @@ public class Player extends Activity {
 		f.addAction(PlayerService.METADATA_CHANGED);
 		registerReceiver(broadcastReceiver, new IntentFilter(f));
 		
-		ImageView play = (ImageView) findViewById(R.id.playButton);
+		play = (ImageView) findViewById(R.id.playButton);
 	    play.setOnClickListener(playOnClickListener);
-	    play.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-					if(player.isPlaying()) {
-						((ImageView) v).setImageResource(R.drawable.pause_depressed);
-					}
-					else {
-						((ImageView) v).setImageResource(R.drawable.play_depressed);
-					}
-				}
-				else {
-					if((player.isPlaying() && event.getAction() == MotionEvent.ACTION_UP)
-						|| (!player.isPlaying() && event.getAction() == MotionEvent.ACTION_CANCEL)) {
-						((ImageView) v).setImageResource(R.drawable.play);
-					}
-					else {
-						((ImageView) v).setImageResource(R.drawable.pause);
-					}
-				}
-				return false;
-			}
-		});
 	    ImageView next = (ImageView) findViewById(R.id.nextButton);
 	    next.setOnClickListener(nextOnClickListener);
-	    next.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-					((ImageView) v).setImageResource(R.drawable.next_depressed);
-				}
-				else {
-					((ImageView) v).setImageResource(R.drawable.next);
-				}
-				return false;
-			}
-		});
 	    ImageView library = (ImageView) findViewById(R.id.libraryButton);
 	    library.setOnClickListener(libraryOnClickListener);
-	    library.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-					((ImageView) v).setImageResource(R.drawable.library_depressed);
-				}
-				else {
-					((ImageView) v).setImageResource(R.drawable.library);
-				}
-				return false;
-			}
-		});
 	    Button current = (Button) findViewById(R.id.currentButton);
 	    current.setOnClickListener(currentOnClickListener);
 	    
@@ -169,6 +123,14 @@ public class Player extends Activity {
 		albumArt.setImageBitmap(MediaDB.getAlbumArt(getContentResolver(), albumId));
 	}
 	
+	void setPlayButton() {
+		play.setImageResource(R.drawable.play_image_button);
+	}
+	
+	void setPauseButton() {
+		play.setImageResource(R.drawable.pause_image_button);
+	}
+	
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		public void onReceive(Context context, Intent intent) {
 			if(intent.getAction().equals(PlayerService.METADATA_CHANGED)) {
@@ -182,6 +144,9 @@ public class Player extends Activity {
 			player = ((PlayerService.LocalBinder)service).getService();
 			setMeta(player.getCurrentSong());
 			refreshInfo();
+			if(player.isPlaying()) {
+				setPauseButton();
+			}
 		}
 		public void onServiceDisconnected(ComponentName name) {
 			player = null;
@@ -212,9 +177,11 @@ public class Player extends Activity {
 		public void onClick(View v) {
 			if(player.isPlaying()) {
 				player.pause(); // add button changing code to the player. playlisteneer?
+				setPlayButton();
 			}
 			else {
 				player.play();// change this to a message passing thing!!!
+				setPauseButton();
 			}
 		}
 	};
