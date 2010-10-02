@@ -1,8 +1,5 @@
 package media.yam;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.Calendar;
 
 import media.yam.MediaDB.SongInfo;
@@ -10,23 +7,16 @@ import media.yam.MediaDB.SongInfo;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.MediaStore.Audio.Media;
 import android.text.format.DateFormat;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -37,8 +27,6 @@ public class Player extends Activity {
 	
 	private PlayerService player;
 	private boolean playerIsBound;
-	private Bundle extras;
-
 	private TextView songTitle;
 	private TextView songAlbum;
 	private TextView songArtist;
@@ -129,9 +117,6 @@ public class Player extends Activity {
 	    songTitle = (TextView) Player.this.findViewById(R.id.songTitle);
 	    songAlbum = (TextView) Player.this.findViewById(R.id.songAlbum);
 	    songArtist = (TextView) Player.this.findViewById(R.id.songArtist);
-	    
-	    
-		extras = getIntent().getExtras();
 	}
 
 	@Override

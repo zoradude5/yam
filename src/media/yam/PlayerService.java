@@ -3,7 +3,6 @@ package media.yam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -60,14 +59,21 @@ public class PlayerService extends Service {
 		TelephonyManager telephony = (TelephonyManager)
 			this.getSystemService(Context.TELEPHONY_SERVICE);
 		telephony.listen(new PhoneStateListener() {
+			boolean unpause = false;
 			public void onCallStateChanged(int state, String incomingNumber) {
 				super.onCallStateChanged(state, incomingNumber);
 				switch(state) {
 				case TelephonyManager.CALL_STATE_IDLE:
-					play();
+					if(unpause) {
+						unpause = false;
+						play();	
+					}
 					break;
 				default:
-					pause();
+					if(isPlaying()) {
+						unpause = true;
+						pause();	
+					}
 					break;
 				}
 			}
