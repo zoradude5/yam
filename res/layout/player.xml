@@ -3,63 +3,54 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView
-	android:id="@+id/songProgress"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-	/>
-<SeekBar
-	android:id="@+id/seekBar"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/songProgress" 
-    />
-<Button
-	android:id="@+id/currentButton"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/seekBar" 
-    android:text="current"
-    />
-<TextView
-	android:id="@+id/songTitle"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/currentButton" 
-	/>
-<TextView
-	android:id="@+id/songAlbum"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/songTitle" 
-	/>
-<TextView
-	android:id="@+id/songArtist"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/songAlbum" 
-	/>
-<Button
-	android:id="@+id/shuffleButton"
-	android:text="shuffle off"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_below="@id/songArtist" 
-	/>
-<ImageView
-	android:id="@+id/albumArt"
-  	android:layout_width="220dip"
-	android:layout_height="220dip"
-    android:layout_below="@id/shuffleButton" 
-    />
-    <!-- 
-<ImageView
-	android:id="@+id/prevButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-	android:layout_alignParentBottom="true"
-   	android:src="@drawable/prev" />-->
+<LinearLayout
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	>
+	<TextView
+		android:id="@+id/songArtist"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+		/>
+	<!-- <TextView
+		android:id="@+id/songAlbum"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+		/>-->
+	<TextView
+		android:id="@+id/songTitle"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+		/>
+	<ImageView
+		android:id="@+id/albumArt"
+	  	android:layout_width="160dip"
+		android:layout_height="160dip"
+	    />
+	<TextView
+		android:id="@+id/songProgress"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content" 
+		/>
+	<SeekBar
+		android:id="@+id/seekBar"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    />
+	<Button
+		android:id="@+id/shuffleButton"
+		android:text="shuffle off"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+		/>
+	<Button
+		android:id="@+id/currentButton"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="current"
+	    />
+</LinearLayout>
 <ImageView
 	android:id="@+id/libraryButton"
     android:layout_width="wrap_content"

@@ -56,7 +56,8 @@ public class Player extends Activity {
 					}
 				}
 				else {
-					if(player.isPlaying()) {//change this to rely on a message or something sent by service
+					if((player.isPlaying() && event.getAction() == MotionEvent.ACTION_UP)
+						|| (!player.isPlaying() && event.getAction() == MotionEvent.ACTION_CANCEL)) {
 						((ImageView) v).setImageResource(R.drawable.play);
 					}
 					else {
@@ -105,7 +106,7 @@ public class Player extends Activity {
 					shuffleButton.setText("shuffle on");
 				}
 				else {
-					shuffleButton.setText("shuffle on");
+					shuffleButton.setText("shuffle off");
 				}
 			}
 		});
@@ -115,7 +116,7 @@ public class Player extends Activity {
 	    seekBar.setMax(1000);
 
 	    songTitle = (TextView) Player.this.findViewById(R.id.songTitle);
-	    songAlbum = (TextView) Player.this.findViewById(R.id.songAlbum);
+	    //songAlbum = (TextView) Player.this.findViewById(R.id.songAlbum);
 	    songArtist = (TextView) Player.this.findViewById(R.id.songArtist);
 	}
 
@@ -158,12 +159,12 @@ public class Player extends Activity {
 	
 	void setMeta(String title, String album, String artist, long albumId) {
 		songTitle.setText(title);
-		songAlbum.setText(album);
+		//songAlbum.setText(album);
 		songArtist.setText(artist);
 		setAlbumArt(albumId);
 	}
 	
-	void setAlbumArt(long albumId) {//TODO
+	void setAlbumArt(long albumId) {
 		ImageView albumArt = (ImageView) findViewById(R.id.albumArt);
 		albumArt.setImageBitmap(MediaDB.getAlbumArt(getContentResolver(), albumId));
 	}
