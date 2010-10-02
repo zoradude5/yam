@@ -35,17 +35,20 @@ public class SongList extends ListActivity {
         extras = getIntent().getExtras();
         
         String selection = null;
+        String orderBy = null;
         
         if(extras.containsKey(Media.ARTIST_ID)) {
         	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
+        	orderBy = Media.TITLE;
         }
         else if(extras.containsKey(Media.ALBUM_ID)) {
         	selection = Media.ALBUM_ID + "=" + extras.getLong(Media.ALBUM_ID);
+        	orderBy = Media.TRACK;
         }
         
         
         Cursor c = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-        		new String[]{Media._ID, Media.TITLE}, selection, null, null);
+        		new String[]{Media._ID, Media.TITLE}, selection, null, orderBy);
         
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
         		new String[]{Media.TITLE}, new int[]{R.id.song_title});
