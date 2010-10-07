@@ -113,6 +113,9 @@ public class PlayerService extends Service {
 				else {
 					position = extras.getInt(PLAYLIST_POSITION);
 					changeCurrentlyPlaying(true);
+					if(shuffle) {
+						shuffle();
+					}
 				}
 			}
 			
@@ -211,10 +214,10 @@ public class PlayerService extends Service {
 	boolean getShuffle() { return shuffle; }
 	
 	void shuffle() {
-		if(!shuffle) {
+		//if(!shuffle) {
 			unplayed = new ArrayList<Long>();
 			unplayed.addAll(playlist);
-		}
+		//}
 		shuffle = true;
 	}
 	
@@ -272,6 +275,9 @@ public class PlayerService extends Service {
 			setPlaylist(results);
 			results.close();
 			changeCurrentlyPlaying(true);
+			if(shuffle) {
+				shuffle();
+			}
 		}
 	}
 

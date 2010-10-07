@@ -108,7 +108,9 @@ public class Player extends Activity {
 	}
 	
 	void setMeta(SongInfo si) {
-		setMeta(si.title, si.album, si.artist, si.albumId);
+		if(si != null) {
+			setMeta(si.title, si.album, si.artist, si.albumId);
+		}
 	}
 	
 	void setMeta(String title, String album, String artist, long albumId) {
