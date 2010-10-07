@@ -2,6 +2,7 @@ package media.yam;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -86,6 +87,23 @@ public class MediaDB {
     
     public long increment(long id, int type) {
     	return add(id, type, System.currentTimeMillis());
+    }
+    
+    public Long[] top(int threshhold) {
+    	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+")"}, 
+    			KEY_TYPE+"=?", 
+    			new String[]{String.valueOf(ACTION_PLAY)}, 
+    			KEY_MEDIA_ID, null, null);
+    	ArrayList<Long> result = new ArrayList<Long>();
+    	int i=0;
+    	c.moveToFirst();
+    	do {
+    		if(c.getInt(1) > 3) {
+    			result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));
+    		}
+    	}
+    	while(c.moveToNext());
+    	return result.toArray(new Long[]{});
     }
     
     public static class SongInfo {

@@ -35,6 +35,13 @@ public class Landing extends TabActivity {
                 res.getDrawable(R.drawable.library))
             .setContent(intent);
 		tabHost.addTab(spec);
+
+		intent = new Intent(this, SongList.class);
+		intent.setAction(SongList.ACTION_TOP);
+		spec = tabHost.newTabSpec("topsongs").setIndicator("Top Songs",
+                res.getDrawable(R.drawable.library))
+            .setContent(intent);
+		tabHost.addTab(spec);
 		
 		tabHost.setCurrentTab(0);
 	

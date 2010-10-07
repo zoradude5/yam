@@ -11,14 +11,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.RemoteViews.ActionException;
 import android.widget.SimpleCursorAdapter;
 
 public class SongList extends ListActivity {
 	private static final int PLAY_SONG = 1;
+	
+	public static final String ACTION_TOP = "media.yam.action.TOP";
 	
 	private static final int MENU_PLAY_NOW = Menu.FIRST;
 	private static final int MENU_PLAY_NEXT = Menu.FIRST + 1;
@@ -36,6 +44,8 @@ public class SongList extends ListActivity {
         
         String selection = null;
         String orderBy = null;
+        Cursor c = null;
+        ListAdapter adapter = null;
         if(extras != null) {
 	        if(extras.containsKey(Media.ARTIST_ID)) {
 	        	selection = Media.ARTIST_ID + "=" + extras.getLong(Media.ARTIST_ID);
@@ -46,16 +56,39 @@ public class SongList extends ListActivity {
 	        	orderBy = Media.TRACK;
 	        }
         }
+        else if(ACTION_TOP.equals(getIntent().getAction())) {
+        	MediaDB db = new MediaDB(this);
+        	db.open();
+        	final Long[] playlist = db.top(10);
+        	db.close();
+
+        	adapter = new ArrayAdapter<Long>(this, R.layout.song, playlist) {
+				@Override
+				public View getView(int position, View convertView,
+						ViewGroup parent) {
+					TextView v = (TextView) super.getView(position, convertView, parent);
+					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), playlist[position]);
+					
+					v.setText(si.title);//playlist[position].toString());//si.title);
+					
+					return v;
+				}
+        	};
+        }
         else {
         	orderBy = Media.TITLE;
+        	
         }
         
+        if(c == null) {
+	        c = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
+	        		new String[]{Media._ID, Media.TITLE}, selection, null, orderBy);
+        }
         
-        Cursor c = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
-        		new String[]{Media._ID, Media.TITLE}, selection, null, orderBy);
-        
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
-        		new String[]{Media.TITLE}, new int[]{R.id.song_title});
+        if(adapter == null) {
+		    adapter = new SimpleCursorAdapter(this, R.layout.song, c, 
+		    		new String[]{Media.TITLE}, new int[]{R.id.song_title});
+        }
         setListAdapter(adapter);
         
         ListView lv = getListView();
@@ -97,7 +130,10 @@ public class SongList extends ListActivity {
 
 
 	private void launchPlayer(int position, long id) {
-		if(extras.containsKey(Media.ARTIST_ID)) {
+		if(ACTION_TOP.equals(getIntent().getAction())) {
+			
+		}
+		else if(extras.containsKey(Media.ARTIST_ID)) {
 			startPlayer(this, PlayerService.ACTION_PLAY_ARTIST, extras, Media.ARTIST_ID, position, id);
 		}
 		else if(extras.containsKey(Media.ALBUM_ID)) {
