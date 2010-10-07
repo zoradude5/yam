@@ -194,7 +194,7 @@ public class Player extends Activity {
 	View.OnClickListener libraryOnClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			startActivityForResult(new Intent(Player.this, ArtistList.class), 0);
+			startActivityForResult(new Intent(Player.this, Landing.class), 0);
 		}
 	};
 	

@@ -98,7 +98,9 @@ public class MediaDB {
     	int i=0;
     	c.moveToFirst();
     	do {
-    		if(c.getInt(1) > 3) {
+    		if(c.getInt(1) > threshhold && null != getSong(mCtx.getContentResolver(), 
+    				c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)))) {
+    			
     			result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));
     		}
     	}
@@ -121,12 +123,15 @@ public class MediaDB {
     }
     
     public static SongInfo getSong(ContentResolver cr, long id) {
+    	SongInfo si = null;
     	Cursor c = cr.query(Uri.withAppendedPath(Media.EXTERNAL_CONTENT_URI, String.valueOf(id)), 
 			new String[]{Media.ARTIST, Media.ALBUM, Media.TITLE, Media.ALBUM_ID}, 
 			null, null, null);
-    	c.moveToFirst();
-    	SongInfo si = new SongInfo(c.getString(0), c.getString(1), c.getString(2), c.getLong(3));
-    	si.id = id;
+    	if(c.getCount() != 0) {
+	    	c.moveToFirst();
+	    	si = new SongInfo(c.getString(0), c.getString(1), c.getString(2), c.getLong(3));
+	    	si.id = id;
+    	}
     	c.close();
     	return si;
     }
