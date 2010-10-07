@@ -42,12 +42,14 @@ public class PlayerService extends Service {
 	private Random rnd = new Random();
 
 	public static String PLAYLIST_POSITION = "position";
+	public static String PLAYLIST = "playlist";
 	public static final String ACTION_PAUSE = "media.yam.action.PAUSE";
 	public static final String ACTION_PLAY = "media.yam.action.PLAY";
 	public static final String ACTION_PLAY_NEXT = "media.yam.action.PLAY_NEXT";
 	public static final String ACTION_CHANGE_TRACK = "media.yam.action.CHANGE_TRACK";
 	public static final String ACTION_PLAY_ALBUM = "media.yam.action.PLAY_ALBUM";
 	public static final String ACTION_PLAY_ARTIST = "media.yam.action.PLAY_ARTIST";
+	public static final String ACTION_PLAY_PLAYLIST = "media.yam.action.PLAY_PLAYLIST";
 
 	public static final String METADATA_CHANGED = "media.yam.broadcast.METADATA_CHANGED";
 
@@ -93,6 +95,7 @@ public class PlayerService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Bundle extras = intent.getExtras();
+		List<Long> newPlaylist;
 		if (extras != null) {
 			String action = intent.getAction();
 			if (ACTION_PLAY_NEXT.equals(action)) {
@@ -101,10 +104,16 @@ public class PlayerService extends Service {
 				}
 			}
 			else if(ACTION_PLAY_ARTIST.equals(action)) {
-				setPlaylist(extras, Media.ARTIST_ID, Media.TITLE);
+				newPlaylist = albumArtistQuery(extras, Media.ARTIST_ID, Media.TITLE);
+				changeToPlaylist(newPlaylist, extras, Media.ARTIST_ID);
 			}
 			else if(ACTION_PLAY_ALBUM.equals(action)) {
-				setPlaylist(extras, Media.ALBUM_ID, Media.TRACK);
+				newPlaylist = albumArtistQuery(extras, Media.ARTIST_ID, Media.TITLE);
+				changeToPlaylist(newPlaylist, extras, Media.ALBUM_ID);
+			}
+			else if(ACTION_PLAY_PLAYLIST.equals(action)) {
+				newPlaylist = toPlaylist(extras.getLongArray(PLAYLIST));
+				changeToPlaylist(newPlaylist, extras, "");
 			}
 			else if(ACTION_CHANGE_TRACK.equals(action)) {
 				if(position == extras.getInt(PLAYLIST_POSITION)) {
@@ -239,41 +248,56 @@ public class PlayerService extends Service {
 		return this.position;
 	}
 
-	void setPlaylist(Long[] playlist) {
-		this.playlist = Arrays.asList(playlist);
+	List<Long> toPlaylist(Long[] playlist) {
+		return Arrays.asList(playlist);
 	}
 
-	void setPlaylist(Cursor results) {
+	List<Long> toPlaylist(long[] playlist) {
+		Long[] t = new Long[playlist.length];
+		for(int i = 0; i < playlist.length; i++) {
+			t[i] = playlist[i];
+		}
+		return toPlaylist(t);
+	}
+
+	List<Long> toPlaylist(Cursor results) {
+		ArrayList<Long> pl = null;
 		if (results.getCount() > 0) {
-			playlist = new ArrayList<Long>(results.getCount());
+			pl = new ArrayList<Long>(results.getCount());
 			results.moveToFirst();
 			do {
-				playlist.add(results.getLong(results
+				pl.add(results.getLong(results
 						.getColumnIndexOrThrow(Media._ID)));
 			} while (results.moveToNext());
 		} else {
 			Log.e(PlayerService.class.getSimpleName(),
 					"Service was given a query that produced no results. ");
 		}
+		return pl;
+	}
+	
+	private List<Long> albumArtistQuery(Bundle extras, String key, String orderBy) {
+		Cursor results = getContentResolver().query(
+				Media.EXTERNAL_CONTENT_URI,
+				new String[] { Media._ID },
+				key + "=?",
+				new String[] { String.valueOf(extras
+						.getLong(key)) }, orderBy);
+		List<Long> l = toPlaylist(results);
+		results.close();
+		return l;
 	}
 
-	private void setPlaylist(Bundle extras, String key, String orderBy) {
-		if(key == playlistType && playlistId == extras.getLong(key) 
+	private void changeToPlaylist(List<Long> playlist, Bundle extras, String key) {
+		if(key == playlistType && playlistId != -1 && playlistId == extras.getLong(key) 
 				&& position == extras.getInt(PLAYLIST_POSITION)) {
 			play();
 		}
 		else {
+			this.playlist = playlist;
 			playlistType = key;
-			playlistId = extras.getLong(key);
+			playlistId = extras.containsKey(key) ? extras.getLong(key) : -1;
 			position = extras.getInt(PLAYLIST_POSITION);
-			Cursor results = getContentResolver().query(
-					Media.EXTERNAL_CONTENT_URI,
-					new String[] { Media._ID },
-					key + "=?",
-					new String[] { String.valueOf(extras
-							.getLong(key)) }, orderBy);
-			setPlaylist(results);
-			results.close();
 			changeCurrentlyPlaying(true);
 			if(shuffle) {
 				shuffle();

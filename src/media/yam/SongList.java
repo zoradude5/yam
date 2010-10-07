@@ -31,6 +31,7 @@ public class SongList extends ListActivity {
 	private static final int MENU_PLAY_NOW = Menu.FIRST;
 	private static final int MENU_PLAY_NEXT = Menu.FIRST + 1;
 	private Bundle extras;
+	private Long[] topPlaylist;
 
 
 
@@ -59,15 +60,15 @@ public class SongList extends ListActivity {
         else if(ACTION_TOP.equals(getIntent().getAction())) {
         	MediaDB db = new MediaDB(this);
         	db.open();
-        	final Long[] playlist = db.top(10);
+        	topPlaylist = db.top(10);
         	db.close();
 
-        	adapter = new ArrayAdapter<Long>(this, R.layout.song, playlist) {
+        	adapter = new ArrayAdapter<Long>(this, R.layout.song, topPlaylist) {
 				@Override
 				public View getView(int position, View convertView,
 						ViewGroup parent) {
 					TextView v = (TextView) super.getView(position, convertView, parent);
-					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), playlist[position]);
+					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), topPlaylist[position]);
 					
 					v.setText(si.title);//playlist[position].toString());//si.title);
 					
@@ -131,7 +132,17 @@ public class SongList extends ListActivity {
 
 	private void launchPlayer(int position, long id) {
 		if(ACTION_TOP.equals(getIntent().getAction())) {
-			
+			Intent service = new Intent(this, PlayerService.class);
+			service.setAction(PlayerService.ACTION_PLAY_PLAYLIST);
+			long[] t = new long[topPlaylist.length];
+			for(int i = 0; i < t.length; i++) {
+				t[i] = topPlaylist[i];
+			}
+			service.putExtra(PlayerService.PLAYLIST, t);
+			service.putExtra(PlayerService.PLAYLIST_POSITION, position);
+			this.startService(service);
+			Intent i = new Intent(this, Player.class);
+			this.startActivityForResult(i, PLAY_SONG);
 		}
 		else if(extras.containsKey(Media.ARTIST_ID)) {
 			startPlayer(this, PlayerService.ACTION_PLAY_ARTIST, extras, Media.ARTIST_ID, position, id);
