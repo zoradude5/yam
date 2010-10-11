@@ -32,7 +32,7 @@ public class AlbumList<K> extends ListActivity {
         extras = getIntent().getExtras();
         
         String selection = null;
-        String orderBy = null;
+        String orderBy = Media.ALBUM;
         ListView lv = getListView();
         
         if(extras != null && extras.containsKey(Media.ARTIST_ID)) {
@@ -46,7 +46,6 @@ public class AlbumList<K> extends ListActivity {
 
         }
         else {
-        	orderBy = Media.ALBUM;
         }
         
         

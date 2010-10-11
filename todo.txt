@@ -44,3 +44,6 @@ delete song from sd card? what happens to our playlist?
 consider imagebutton instead of imageview. it makes a pretty button thing.
 
 fade in after a phone call?
+
+lyrics!
+shake2play!
