@@ -50,6 +50,7 @@ public class PlayerService extends Service {
 	public static final String ACTION_PLAY_ALBUM = "media.yam.action.PLAY_ALBUM";
 	public static final String ACTION_PLAY_ARTIST = "media.yam.action.PLAY_ARTIST";
 	public static final String ACTION_PLAY_PLAYLIST = "media.yam.action.PLAY_PLAYLIST";
+	public static final String ACTION_PLAY_ALLSONGS = "media.yam.action.PLAY_ALL_SONGS";
 
 	public static final String METADATA_CHANGED = "media.yam.broadcast.METADATA_CHANGED";
 
@@ -113,6 +114,12 @@ public class PlayerService extends Service {
 			}
 			else if(ACTION_PLAY_PLAYLIST.equals(action)) {
 				newPlaylist = toPlaylist(extras.getLongArray(PLAYLIST));
+				changeToPlaylist(newPlaylist, extras, "");
+			}
+			else if(ACTION_PLAY_ALLSONGS.equals(action)) {
+				Cursor cursor = getContentResolver().query(Media.EXTERNAL_CONTENT_URI, 
+		        		new String[]{Media._ID, Media.TITLE}, null, null, Media.TITLE); 
+				newPlaylist = toPlaylist(cursor);
 				changeToPlaylist(newPlaylist, extras, "");
 			}
 			else if(ACTION_CHANGE_TRACK.equals(action)) {

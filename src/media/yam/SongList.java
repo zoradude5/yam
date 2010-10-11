@@ -67,7 +67,7 @@ public class SongList extends ListActivity {
 				@Override
 				public View getView(int position, View convertView,
 						ViewGroup parent) {
-					TextView v = (TextView) super.getView(position, convertView, parent);
+					TextView v = (TextView) super.getView(position, convertView, parent).findViewById(R.id.song_title);
 					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), topPlaylist[position]);
 					
 					v.setText(si.title);//playlist[position].toString());//si.title);
@@ -143,6 +143,15 @@ public class SongList extends ListActivity {
 			this.startService(service);
 			Intent i = new Intent(this, Player.class);
 			this.startActivityForResult(i, PLAY_SONG);
+		}
+		else if(extras == null){
+			Intent service = new Intent(this, PlayerService.class);
+			service.setAction(PlayerService.ACTION_PLAY_ALLSONGS);
+			service.putExtra(PlayerService.PLAYLIST_POSITION, position);
+			this.startService(service);
+			Intent i = new Intent(this, Player.class);
+			this.startActivityForResult(i, PLAY_SONG);
+			
 		}
 		else if(extras.containsKey(Media.ARTIST_ID)) {
 			startPlayer(this, PlayerService.ACTION_PLAY_ARTIST, extras, Media.ARTIST_ID, position, id);
