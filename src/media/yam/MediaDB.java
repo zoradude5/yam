@@ -93,7 +93,7 @@ public class MediaDB {
     	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+") as play_count"}, 
     			KEY_TYPE+"=?", 
     			new String[]{String.valueOf(ACTION_PLAY)}, 
-    			KEY_MEDIA_ID, null, "play_count");
+    			KEY_MEDIA_ID, null, "play_count DESC");
     	ArrayList<Long> result = new ArrayList<Long>();
     	if(c.getCount() > 0) {
 	    	c.moveToFirst();
@@ -109,8 +109,8 @@ public class MediaDB {
     
     public int getPlayCount(long id) {
     	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+")"}, 
-    			KEY_TYPE+"=?", 
-    			new String[]{String.valueOf(ACTION_PLAY)}, 
+    			KEY_TYPE+"=? AND " + KEY_MEDIA_ID+"=?", 
+    			new String[]{String.valueOf(ACTION_PLAY), String.valueOf(id)}, 
     			KEY_MEDIA_ID, null, null);
     	int result = 0;
     	if(c.getCount() > 0) {

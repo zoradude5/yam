@@ -32,6 +32,7 @@ public class SongList extends ListActivity {
 	private static final int MENU_PLAY_NEXT = Menu.FIRST + 1;
 	private Bundle extras;
 	private Long[] topPlaylist;
+	private MediaDB db;
 
 
 
@@ -39,6 +40,8 @@ public class SongList extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    	db = new MediaDB(this);
+    	db.open();
         setContentView(R.layout.songs);
         registerForContextMenu(getListView());
         extras = getIntent().getExtras();
@@ -58,24 +61,20 @@ public class SongList extends ListActivity {
 	        }
         }
         else if(ACTION_TOP.equals(getIntent().getAction())) {
-        	MediaDB db = new MediaDB(this);
-        	db.open();
         	topPlaylist = db.top();
-        	final int[] playCounts = new int[topPlaylist.length];
-        	for(int i = 0; i < topPlaylist.length; i++) {
-        		playCounts[i] = db.getPlayCount(topPlaylist[i]);
-        	}
-        	db.close();
 
         	adapter = new ArrayAdapter<Long>(this, R.layout.song, topPlaylist) {
+	        	
 				@Override
 				public View getView(int position, View convertView,
 						ViewGroup parent) {
 					TextView v = (TextView) super.getView(position, convertView, parent);
 					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), topPlaylist[position]);
-					
-					v.setText(si.title + " (" + playCounts[position] + ")");//playlist[position].toString());//si.title);
-					
+
+		        	int playCount = db.getPlayCount(topPlaylist[position]);
+		        	
+					v.setText(si.title + " (" + playCount + ")");//playlist[position].toString());//si.title);
+
 					return v;
 				}
         	};
@@ -106,6 +105,12 @@ public class SongList extends ListActivity {
           }
         });
     }
+
+	@Override
+	protected void onDestroy() {
+    	db.close();
+		super.onDestroy();
+	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
