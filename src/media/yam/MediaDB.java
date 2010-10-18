@@ -89,21 +89,37 @@ public class MediaDB {
     	return add(id, type, System.currentTimeMillis());
     }
     
-    public Long[] top(int threshhold) {
+    public Long[] top() {
+    	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+") as play_count"}, 
+    			KEY_TYPE+"=?", 
+    			new String[]{String.valueOf(ACTION_PLAY)}, 
+    			KEY_MEDIA_ID, null, "play_count");
+    	ArrayList<Long> result = new ArrayList<Long>();
+    	if(c.getCount() > 0) {
+	    	c.moveToFirst();
+	    	do {
+	    		//if(c.getInt(1) > 3) {
+	    		result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));
+	    	}
+	    	while(c.moveToNext());
+    	}
+    	c.close();
+    	return result.toArray(new Long[]{});
+    }
+    
+    public int getPlayCount(long id) {
     	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+")"}, 
     			KEY_TYPE+"=?", 
     			new String[]{String.valueOf(ACTION_PLAY)}, 
     			KEY_MEDIA_ID, null, null);
-    	ArrayList<Long> result = new ArrayList<Long>();
-    	int i=0;
-    	c.moveToFirst();
-    	do {
-    		if(c.getInt(1) > 3) {
-    			result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));
-    		}
+    	int result = 0;
+    	if(c.getCount() > 0) {
+	    	c.moveToFirst();
+	    	result = c.getInt(1);
     	}
-    	while(c.moveToNext());
-    	return result.toArray(new Long[]{});
+    	c.close();
+		return result;
+    	
     }
     
     public static class SongInfo {

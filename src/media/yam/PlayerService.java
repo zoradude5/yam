@@ -108,7 +108,7 @@ public class PlayerService extends Service {
 				changeToPlaylist(newPlaylist, extras, Media.ARTIST_ID);
 			}
 			else if(ACTION_PLAY_ALBUM.equals(action)) {
-				newPlaylist = albumArtistQuery(extras, Media.ARTIST_ID, Media.TITLE);
+				newPlaylist = albumArtistQuery(extras, Media.ALBUM_ID, Media.TRACK);
 				changeToPlaylist(newPlaylist, extras, Media.ALBUM_ID);
 			}
 			else if(ACTION_PLAY_PLAYLIST.equals(action)) {

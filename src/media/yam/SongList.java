@@ -60,7 +60,11 @@ public class SongList extends ListActivity {
         else if(ACTION_TOP.equals(getIntent().getAction())) {
         	MediaDB db = new MediaDB(this);
         	db.open();
-        	topPlaylist = db.top(10);
+        	topPlaylist = db.top();
+        	final int[] playCounts = new int[topPlaylist.length];
+        	for(int i = 0; i < topPlaylist.length; i++) {
+        		playCounts[i] = db.getPlayCount(topPlaylist[i]);
+        	}
         	db.close();
 
         	adapter = new ArrayAdapter<Long>(this, R.layout.song, topPlaylist) {
@@ -70,7 +74,7 @@ public class SongList extends ListActivity {
 					TextView v = (TextView) super.getView(position, convertView, parent);
 					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), topPlaylist[position]);
 					
-					v.setText(si.title);//playlist[position].toString());//si.title);
+					v.setText(si.title + " (" + playCounts[position] + ")");//playlist[position].toString());//si.title);
 					
 					return v;
 				}
