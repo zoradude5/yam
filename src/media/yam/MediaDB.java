@@ -89,23 +89,40 @@ public class MediaDB {
     	return add(id, type, System.currentTimeMillis());
     }
     
-    public Long[] top(int threshhold) {
-    	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+")"}, 
+    public Long[] top() {
+    	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+") as play_count"}, 
     			KEY_TYPE+"=?", 
     			new String[]{String.valueOf(ACTION_PLAY)}, 
-    			KEY_MEDIA_ID, null, null);
+    			KEY_MEDIA_ID, null, "play_count DESC");
     	ArrayList<Long> result = new ArrayList<Long>();
-    	int i=0;
-    	c.moveToFirst();
-    	do {
-    		if(c.getInt(1) > threshhold && null != getSong(mCtx.getContentResolver(), 
+    	if(c.getCount() > 0) {
+	    	c.moveToFirst();
+	    	do {
+	    		//if(c.getInt(1) > 3) {
+                if(null != getSong(mCtx.getContentResolver(), 
     				c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)))) {
-    			
-    			result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));
-    		}
+                    result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));
+                }
+	    	}
+	    	while(c.moveToNext());
     	}
-    	while(c.moveToNext());
+    	c.close();
     	return result.toArray(new Long[]{});
+    }
+    
+    public int getPlayCount(long id) {
+    	Cursor c = mDb.query(DATABASE_TABLE, new String[]{KEY_MEDIA_ID, "COUNT("+KEY_MEDIA_ID+")"}, 
+    			KEY_TYPE+"=? AND " + KEY_MEDIA_ID+"=?", 
+    			new String[]{String.valueOf(ACTION_PLAY), String.valueOf(id)}, 
+    			KEY_MEDIA_ID, null, null);
+    	int result = 0;
+    	if(c.getCount() > 0) {
+	    	c.moveToFirst();
+	    	result = c.getInt(1);
+    	}
+    	c.close();
+		return result;
+    	
     }
     
     public static class SongInfo {
