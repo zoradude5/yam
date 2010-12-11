@@ -94,11 +94,11 @@ public class MediaDB {
     			KEY_TYPE+"=?", 
     			new String[]{String.valueOf(ACTION_PLAY)}, 
     			KEY_MEDIA_ID, null, "play_count DESC");
+    	//return c;
     	ArrayList<Long> result = new ArrayList<Long>();
     	if(c.getCount() > 0) {
 	    	c.moveToFirst();
 	    	do {
-	    		//if(c.getInt(1) > 3) {
                 if(null != getSong(mCtx.getContentResolver(), 
     				c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)))) {
                     result.add(c.getLong(c.getColumnIndexOrThrow(KEY_MEDIA_ID)));

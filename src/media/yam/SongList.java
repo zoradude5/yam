@@ -71,9 +71,9 @@ public class SongList extends ListActivity {
 					TextView v = (TextView) super.getView(position, convertView, parent).findViewById(R.id.song_title);
 					MediaDB.SongInfo si = MediaDB.getSong(SongList.this.getContentResolver(), topPlaylist[position]);
 
-		        	int playCount = db.getPlayCount(topPlaylist[position]);
+		        	//int playCount = db.getPlayCount(topPlaylist[position]);
 		        	
-					v.setText(si.title + " (" + playCount + ")");//playlist[position].toString());//si.title);
+					v.setText(si.title);// + " (" + playCount + ")");//playlist[position].toString());//si.title);
 
 					return v;
 				}

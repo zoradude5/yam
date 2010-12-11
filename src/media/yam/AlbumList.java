@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Media;
@@ -52,8 +54,26 @@ public class AlbumList<K> extends ListActivity {
         Cursor c = getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, 
         		new String[]{Media._ID, Media.ALBUM}, selection, null, orderBy);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.album, c, 
-        		new String[]{Media.ALBUM, Media._ID}, new int[]{R.id.song_title, R.id.albumArt});
-        adapter.setViewBinder(albumArtViewBinder);
+        		new String[]{Media.ALBUM}, new int[]{R.id.song_title}) {
+
+					@Override
+					public void bindView(View view, Context context,
+							Cursor cursor) {
+						super.bindView(view, context, cursor);
+
+						long albumId = cursor.getLong(cursor.getColumnIndexOrThrow(Media._ID));
+						ImageView v = (ImageView) view.findViewById(R.id.albumArt);
+						Bitmap big = MediaDB.getAlbumArt(getContentResolver(), albumId);
+						BitmapDrawable b = new BitmapDrawable(context.getResources(), big);
+						b.setFilterBitmap(false);
+						b.setDither(false);
+						v.setImageDrawable(b);
+						
+						//v.setImageDrawable(Utils.getCachedArtwork(AlbumList.this, albumId, (BitmapDrawable) context.getResources().getDrawable(R.drawable.play)));
+					}
+        	
+        };
+        //adapter.setViewBinder(albumArtViewBinder);
         setListAdapter(adapter);
         lv.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,

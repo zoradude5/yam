@@ -41,7 +41,7 @@ public class Player extends Activity {
 		
 		IntentFilter f = new IntentFilter();
 		f.addAction(PlayerService.METADATA_CHANGED);
-		registerReceiver(broadcastReceiver, new IntentFilter(f));
+		registerReceiver(broadcastReceiver, new IntentFilter(f));// TODO change to remove double constrcuitno?
 		
 		play = (ImageView) findViewById(R.id.playButton);
 	    play.setOnClickListener(playOnClickListener);
